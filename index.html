@@ -39,6 +39,21 @@
       padding: 20px;
       box-shadow: 0 18px 40px rgba(0,0,0,0.45);
     }
+    .top-banner-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .brand-banner {
+      width: 100%;
+      max-height: 75px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
     .header {
       display: flex;
       justify-content: space-between;
@@ -47,13 +62,20 @@
       gap: 10px;
     }
     .brand { display: flex; align-items: center; gap: 10px; }
-    .logo-img {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      object-fit: cover;
-      border: 1.5px solid var(--primary);
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00c4cc 0%, #5a32fa 60%, #7d2ae8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 22px;
+      font-style: italic;
+      color: #ffffff;
       flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 196, 204, 0.3);
     }
     .brand h1 { font-size: 18px; line-height: 1.2; }
     .brand p { font-size: 12px; color: var(--muted); }
@@ -191,9 +213,13 @@
 </head>
 <body>
   <div class="container">
+    <div class="top-banner-wrap">
+      <img src="bienvenida.jfif" alt="Creative Communi" class="brand-banner" />
+    </div>
+
     <div class="header">
       <div class="brand">
-        <img src="bienvenida.jfif" alt="Creative Communi" class="logo-img" />
+        <div class="logo">C</div>
         <div>
           <h1>Registro Canva Pro</h1>
           <p>Completa tus datos para activar</p>

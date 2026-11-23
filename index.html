@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registro Canva Pro</title>
+  <meta property="og:title" content="Registro Oficial Canva Pro | Creative Communi" />
+  <meta property="og:description" content="Calcula tu plan a tasa BCV de hoy y obtén los datos de pago al instante. Sin contraseñas." />
+  <meta property="og:image" content="https://canva-pro-registros.pages.dev/bienvenida.jfif" />
+  <meta property="og:type" content="website" />
   <style>
     :root {
       --bg: #0f172a;
@@ -638,7 +642,6 @@
 
       var ahora = Date.now();
 
-      // 1. Revisar si ya está en bloqueo de 1 hora
       try {
         var rawCooldown = localStorage.getItem(COOLDOWN_KEY);
         if (rawCooldown) {
@@ -652,7 +655,6 @@
         }
       } catch (e) {}
 
-      // 2. Obtener o crear sesión persistente de 15 minutos
       var finSesion = 0;
       try {
         var rawSesion = localStorage.getItem(SESSION_KEY);

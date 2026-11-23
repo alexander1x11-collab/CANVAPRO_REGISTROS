@@ -89,6 +89,11 @@
       font-weight: 700;
       white-space: nowrap;
     }
+    .timer.done {
+      background: rgba(34, 197, 94, 0.16);
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #86efac;
+    }
     .bcv-bar {
       background: rgba(0, 196, 204, 0.12);
       border: 1px solid rgba(0, 196, 204, 0.35);
@@ -207,8 +212,19 @@
     }
     .status-screen { text-align: center; padding: 20px 6px; }
     .status-icon { font-size: 46px; margin-bottom: 10px; }
-    .status-screen h2 { font-size: 20px; margin-bottom: 8px; }
-    .status-screen p { font-size: 14px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
+    .status-screen h2 { font-size: 20px; margin-bottom: 8px; color: #fca5a5; }
+    .status-screen p { font-size: 14px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+    .cooldown-badge {
+      display: inline-block;
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      color: #fecaca;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
   </style>
 </head>
 <body>
@@ -409,10 +425,15 @@
       </div>
     </div>
 
+    <!-- PANTALLA DE BLOQUEO DE 1 HORA -->
     <div id="expiredSection" class="status-screen hidden">
-      <div class="status-icon">⏳</div>
-      <h2>Enlace expirado</h2>
-      <p>Han pasado los 15 minutos de sesión. Recarga la página o solicita un nuevo enlace por WhatsApp.</p>
+      <div class="status-icon">🔒</div>
+      <h2>Tiempo de registro agotado</h2>
+      <p>Pasaron los 15 minutos sin completar el registro. Por seguridad, debes esperar <strong>1 hora</strong> para volver a intentarlo o escribirnos directo al WhatsApp.</p>
+      <div class="cooldown-badge" id="cooldownTimer">⏳ Espera: 60:00</div>
+      <a href="#" target="_blank" class="btn btn-whatsapp" id="waExpirado">
+        💬 Escribir directo al WhatsApp
+      </a>
     </div>
   </div>
 
@@ -421,19 +442,29 @@
     var TU_WHATSAPP = '584163080821';
     var CORREO_PAGOS = 'alexander1x33@gmail.com';
     var STORAGE_KEY = 'canva_reg_bloqueo_v1';
+    var SESSION_KEY = 'canva_reg_sesion_v1';
+    var COOLDOWN_KEY = 'canva_reg_cooldown_v1';
     var HORAS_BLOQUEO = 24;
+    var MINUTOS_SESION = 15;
+    var MINUTOS_COOLDOWN = 60;
 
     var params = new URLSearchParams(window.location.search);
     var HOJA_ACTUAL = params.get('hoja') || 'CANVAS';
 
     if (params.get('nuevo') === '1') {
-      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem(COOLDOWN_KEY);
+      } catch (e) {}
     }
 
     var tasaBCV = 0;
     var planActual = { plan: '1 mes', dias: 30, usd: 1 };
     var datosCliente = { nombre: '', whatsapp: '', correo: '' };
     var yaGuardado = false;
+    var intervaloSesion = null;
+    var intervaloCooldown = null;
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
     function formatDMY(d) { return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear(); }
@@ -518,8 +549,24 @@
       actualizarResumen();
     }
 
+    function detenerRelojPorRegistro() {
+      if (intervaloSesion) {
+        clearInterval(intervaloSesion);
+        intervaloSesion = null;
+      }
+      try {
+        localStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem(COOLDOWN_KEY);
+      } catch (e) {}
+      var timerEl = document.getElementById('timer');
+      timerEl.textContent = '✅ Listo';
+      timerEl.classList.add('done');
+    }
+
     function bloquearFormularioUI() {
       yaGuardado = true;
+      detenerRelojPorRegistro();
+
       document.getElementById('nombre').value = datosCliente.nombre;
       document.getElementById('whatsapp').value = datosCliente.whatsapp;
       document.getElementById('correo').value = datosCliente.correo;
@@ -555,6 +602,99 @@
           localStorage.removeItem(STORAGE_KEY);
         }
       } catch (e) {}
+    }
+
+    function mostrarPantallaCooldown(finBloqueo) {
+      if (intervaloSesion) {
+        clearInterval(intervaloSesion);
+        intervaloSesion = null;
+      }
+      document.getElementById('formSection').classList.add('hidden');
+      document.getElementById('expiredSection').classList.remove('hidden');
+      document.getElementById('timer').textContent = '🔒 Bloqueado';
+
+      var msgExp = 'Hola, se me venció el tiempo de registro de Canva Pro y me pide esperar 1 hora. ¿Me ayudas a registrarme por aquí?';
+      document.getElementById('waExpirado').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgExp);
+
+      function actualizarCooldown() {
+        var rest = Math.ceil((finBloqueo - Date.now()) / 1000);
+        if (rest <= 0) {
+          clearInterval(intervaloCooldown);
+          try { localStorage.removeItem(COOLDOWN_KEY); } catch (e) {}
+          window.location.reload();
+          return;
+        }
+        var m = Math.floor(rest / 60);
+        var s = rest % 60;
+        document.getElementById('cooldownTimer').textContent = '⏳ Tiempo restante: ' + pad(m) + ':' + pad(s);
+      }
+
+      actualizarCooldown();
+      intervaloCooldown = setInterval(actualizarCooldown, 1000);
+    }
+
+    function iniciarControlTiempo() {
+      if (yaGuardado) return;
+
+      var ahora = Date.now();
+
+      // 1. Revisar si ya está en bloqueo de 1 hora
+      try {
+        var rawCooldown = localStorage.getItem(COOLDOWN_KEY);
+        if (rawCooldown) {
+          var cd = JSON.parse(rawCooldown);
+          if (cd && cd.finBloqueo && ahora < cd.finBloqueo) {
+            mostrarPantallaCooldown(cd.finBloqueo);
+            return;
+          } else {
+            localStorage.removeItem(COOLDOWN_KEY);
+          }
+        }
+      } catch (e) {}
+
+      // 2. Obtener o crear sesión persistente de 15 minutos
+      var finSesion = 0;
+      try {
+        var rawSesion = localStorage.getItem(SESSION_KEY);
+        if (rawSesion) {
+          var ses = JSON.parse(rawSesion);
+          if (ses && ses.finSesion) {
+            finSesion = ses.finSesion;
+          }
+        }
+      } catch (e) {}
+
+      if (!finSesion) {
+        finSesion = ahora + (MINUTOS_SESION * 60 * 1000);
+        try {
+          localStorage.setItem(SESSION_KEY, JSON.stringify({ finSesion: finSesion }));
+        } catch (e) {}
+      }
+
+      var timerEl = document.getElementById('timer');
+
+      function tickSesion() {
+        if (yaGuardado) {
+          detenerRelojPorRegistro();
+          return;
+        }
+        var rest = Math.ceil((finSesion - Date.now()) / 1000);
+        if (rest <= 0) {
+          var finBloqueo = Date.now() + (MINUTOS_COOLDOWN * 60 * 1000);
+          try {
+            localStorage.removeItem(SESSION_KEY);
+            localStorage.setItem(COOLDOWN_KEY, JSON.stringify({ finBloqueo: finBloqueo }));
+          } catch (e) {}
+          mostrarPantallaCooldown(finBloqueo);
+          return;
+        }
+        var m = Math.floor(rest / 60);
+        var s = rest % 60;
+        timerEl.textContent = '⏳ ' + pad(m) + ':' + pad(s);
+      }
+
+      tickSesion();
+      intervaloSesion = setInterval(tickSesion, 1000);
     }
 
     function mostrarError(msg) {
@@ -676,22 +816,7 @@
     verificarBloqueoPrevio();
     actualizarResumen();
     cargarTasaBCV();
-
-    var segundos = 15 * 60;
-    var timerEl = document.getElementById('timer');
-    var intervalo = setInterval(function() {
-      segundos--;
-      if (segundos <= 0) {
-        clearInterval(intervalo);
-        timerEl.textContent = '⏳ 00:00';
-        document.getElementById('formSection').classList.add('hidden');
-        document.getElementById('expiredSection').classList.remove('hidden');
-        return;
-      }
-      var m = Math.floor(segundos / 60);
-      var s = segundos % 60;
-      timerEl.textContent = '⏳ ' + pad(m) + ':' + pad(s);
-    }, 1000);
+    iniciarControlTiempo();
   </script>
 </body>
 </html>

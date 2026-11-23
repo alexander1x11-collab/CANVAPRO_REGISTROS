@@ -111,14 +111,16 @@
     .btn {
       width: 100%; padding: 13px; border: none; border-radius: 12px;
       font-size: 14.5px; font-weight: 700; cursor: pointer; transition: 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
     }
+    .btn svg { width: 20px; height: 20px; flex-shrink: 0; }
     .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; }
     .btn-pm { background: var(--success); color: #052e16; margin-bottom: 8px; }
     .btn-binance { background: var(--binance); color: #1e2026; margin-bottom: 8px; }
     .btn-paypal { background: var(--paypal); color: #ffffff; }
     .btn-whatsapp {
       background: #25D366; color: #052e16;
-      text-decoration: none; display: block; text-align: center;
+      text-decoration: none;
     }
     .btn:disabled { opacity: 0.55; cursor: not-allowed; }
     .hidden { display: none !important; }
@@ -138,7 +140,11 @@
     }
     .pay-card.binance-card { border-color: var(--binance); }
     .pay-card.paypal-card { border-color: var(--paypal); }
-    .pay-title { font-size: 15px; font-weight: 800; margin-bottom: 10px; color: var(--primary); text-align: center; }
+    .pay-title {
+      font-size: 15px; font-weight: 800; margin-bottom: 10px;
+      color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .pay-title svg { width: 20px; height: 20px; }
     .binance-card .pay-title { color: var(--binance); }
     .paypal-card .pay-title { color: #38bdf8; }
     .copy-row {
@@ -236,7 +242,7 @@
 
       <div id="errorMsg" class="error-msg hidden"></div>
 
-      <!-- PASO 1: GUARDAR DATOS PRIMERO -->
+      <!-- PASO 1: GUARDAR DATOS AL INSTANTE -->
       <button type="button" class="btn btn-primary" id="btnGuardar" onclick="guardarDatosCliente()">
         💾 Guardar datos y pedir invitación
       </button>
@@ -245,14 +251,30 @@
       <div id="savedSection" class="saved-box hidden">
         <h3>✅ ¡Datos guardados con éxito!</h3>
         <p id="savedText">Ya recibimos tu correo para enviarte la invitación de Canva Pro. Elige cómo deseas pagar:</p>
+
         <button type="button" class="btn btn-pm" onclick="mostrarMetodo('pagomovil')">
-          📲 Ver datos de Pago Móvil (Bs)
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 1H7C5.9 1 5 1.9 5 3v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14zm-5 3c-.83 0-1.5-.67-1.5-1.5S11.17 19 12 19s1.5.67 1.5 1.5S12.83 22 12 22z"/></svg>
+          Ver datos de Pago Móvil (Bs)
         </button>
+
         <button type="button" class="btn btn-binance" onclick="mostrarMetodo('binance')">
-          🟡 Ver datos de Binance ($)
+          <!-- Ícono oficial Binance -->
+          <svg viewBox="0 0 126.61 126.61" fill="currentColor">
+            <polygon points="38.73,53.2 63.3,28.63 87.88,53.21 102.18,38.91 63.3,0 24.43,38.88"/>
+            <rect x="4.19" y="53.2" width="20.22" height="20.22" transform="translate(-40.57 28.63) rotate(-45)"/>
+            <polygon points="38.73,73.41 63.3,97.98 87.88,73.4 102.19,87.7 63.3,126.61 24.43,87.73"/>
+            <rect x="102.2" y="53.2" width="20.22" height="20.22" transform="translate(-11.94 97.94) rotate(-45)"/>
+            <polygon points="77.83,63.3 63.3,48.77 52.58,59.49 51.34,60.73 48.78,63.29 63.3,77.82 77.83,63.3"/>
+          </svg>
+          Ver datos de Binance ($)
         </button>
+
         <button type="button" class="btn btn-paypal" onclick="mostrarMetodo('paypal')">
-          🔵 Ver datos de PayPal ($)
+          <!-- Ícono oficial PayPal -->
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/>
+          </svg>
+          Ver datos de PayPal ($)
         </button>
       </div>
 
@@ -293,7 +315,16 @@
 
       <!-- TARJETA 2: BINANCE -->
       <div id="cardBinance" class="pay-card binance-card hidden">
-        <div class="pay-title">🟡 Datos de Binance Pay ($)</div>
+        <div class="pay-title">
+          <svg viewBox="0 0 126.61 126.61" fill="currentColor">
+            <polygon points="38.73,53.2 63.3,28.63 87.88,53.21 102.18,38.91 63.3,0 24.43,38.88"/>
+            <rect x="4.19" y="53.2" width="20.22" height="20.22" transform="translate(-40.57 28.63) rotate(-45)"/>
+            <polygon points="38.73,73.41 63.3,97.98 87.88,73.4 102.19,87.7 63.3,126.61 24.43,87.73"/>
+            <rect x="102.2" y="53.2" width="20.22" height="20.22" transform="translate(-11.94 97.94) rotate(-45)"/>
+            <polygon points="77.83,63.3 63.3,48.77 52.58,59.49 51.34,60.73 48.78,63.29 63.3,77.82 77.83,63.3"/>
+          </svg>
+          Datos de Binance Pay ($)
+        </div>
 
         <div class="copy-row">
           <div><small>Correo de Binance</small><strong>alexander1x33@gmail.com</strong></div>
@@ -316,7 +347,12 @@
 
       <!-- TARJETA 3: PAYPAL -->
       <div id="cardPaypal" class="pay-card paypal-card hidden">
-        <div class="pay-title">🔵 Datos de PayPal ($)</div>
+        <div class="pay-title">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/>
+          </svg>
+          Datos de PayPal ($)
+        </div>
 
         <div class="copy-row">
           <div><small>Correo de PayPal</small><strong>alexander1x33@gmail.com</strong></div>
@@ -461,10 +497,27 @@
       }
       ocultarError();
 
-      var btn = document.getElementById('btnGuardar');
-      btn.disabled = true;
-      btn.textContent = '⏳ Guardando tus datos...';
+      // 1) Bloquea campos y muestra los métodos de pago AL INSTANTE
+      yaGuardado = true;
+      datosCliente = { nombre: nombre, correo: correo };
 
+      document.getElementById('nombre').disabled = true;
+      document.getElementById('whatsapp').disabled = true;
+      document.getElementById('correo').disabled = true;
+      var botonesPlan = document.querySelectorAll('.plan-btn');
+      for (var i = 0; i < botonesPlan.length; i++) {
+        botonesPlan[i].disabled = true;
+      }
+
+      document.getElementById('btnGuardar').classList.add('hidden');
+      document.getElementById('savedText').textContent =
+        'Ya recibimos tu correo (' + correo + ') para tu plan de ' + planActual.plan + ' ($' + planActual.usd + ' / ' + calcularBsTexto(planActual.usd) + '). Elige tu método de pago:';
+      var savedSec = document.getElementById('savedSection');
+      savedSec.classList.remove('hidden');
+      actualizarEnlacesWhatsApp();
+      savedSec.scrollIntoView({ behavior: 'smooth' });
+
+      // 2) Envía a Google Sheets en segundo plano sin hacer esperar al cliente
       var payload = {
         accion: 'guardar',
         hoja: HOJA_ACTUAL,
@@ -481,33 +534,10 @@
       fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(json) {
-        if (!json.ok) throw new Error(json.error || 'Error al guardar');
-
-        yaGuardado = true;
-        datosCliente = { nombre: nombre, correo: correo };
-
-        document.getElementById('nombre').disabled = true;
-        document.getElementById('whatsapp').disabled = true;
-        document.getElementById('correo').disabled = true;
-        var botonesPlan = document.querySelectorAll('.plan-btn');
-        for (var i = 0; i < botonesPlan.length; i++) {
-          botonesPlan[i].disabled = true;
-        }
-
-        btn.classList.add('hidden');
-        document.getElementById('savedText').textContent =
-          'Ya recibimos tu correo (' + correo + ') para tu plan de ' + planActual.plan + ' ($' + planActual.usd + ' / ' + calcularBsTexto(planActual.usd) + '). Elige tu método de pago:';
-        document.getElementById('savedSection').classList.remove('hidden');
-        actualizarEnlacesWhatsApp();
-      })
-      .catch(function() {
-        mostrarError('No se pudo conectar. Intenta de nuevo en unos segundos.');
-        btn.disabled = false;
-        btn.textContent = '💾 Guardar datos y pedir invitación';
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(function(err) {
+        console.log('Error en segundo plano:', err);
       });
     }
 

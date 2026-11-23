@@ -134,6 +134,13 @@
     }
     .saved-box h3 { color: #86efac; font-size: 15px; margin-bottom: 6px; }
     .saved-box p { color: #e2e8f0; font-size: 13px; line-height: 1.45; margin-bottom: 12px; }
+    .fix-link {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-decoration: underline;
+    }
     .pay-card {
       margin-top: 14px; background: var(--card-2);
       border: 1.5px solid var(--primary); border-radius: 14px; padding: 14px;
@@ -215,17 +222,17 @@
       <div class="field">
         <label>Selecciona tu plan</label>
         <div class="plans">
-          <button type="button" class="plan-btn active" onclick="seleccionarPlan(this, '1 mes', 30, 1)">
+          <button type="button" class="plan-btn active" data-plan="1 mes" onclick="seleccionarPlan(this, '1 mes', 30, 1)">
             <span class="plan-title">1 Mes</span>
             <span class="plan-usd">$1</span>
             <span class="plan-bs" id="bsPlan1">Cargando...</span>
           </button>
-          <button type="button" class="plan-btn" onclick="seleccionarPlan(this, '3 meses', 90, 2)">
+          <button type="button" class="plan-btn" data-plan="3 meses" onclick="seleccionarPlan(this, '3 meses', 90, 2)">
             <span class="plan-title">3 Meses</span>
             <span class="plan-usd">$2</span>
             <span class="plan-bs" id="bsPlan2">Cargando...</span>
           </button>
-          <button type="button" class="plan-btn" onclick="seleccionarPlan(this, '1 año', 365, 3)">
+          <button type="button" class="plan-btn" data-plan="1 año" onclick="seleccionarPlan(this, '1 año', 365, 3)">
             <span class="plan-title">1 Año</span>
             <span class="plan-usd">$3</span>
             <span class="plan-bs" id="bsPlan3">Cargando...</span>
@@ -258,7 +265,6 @@
         </button>
 
         <button type="button" class="btn btn-binance" onclick="mostrarMetodo('binance')">
-          <!-- Ícono oficial Binance -->
           <svg viewBox="0 0 126.61 126.61" fill="currentColor">
             <polygon points="38.73,53.2 63.3,28.63 87.88,53.21 102.18,38.91 63.3,0 24.43,38.88"/>
             <rect x="4.19" y="53.2" width="20.22" height="20.22" transform="translate(-40.57 28.63) rotate(-45)"/>
@@ -270,12 +276,13 @@
         </button>
 
         <button type="button" class="btn btn-paypal" onclick="mostrarMetodo('paypal')">
-          <!-- Ícono oficial PayPal -->
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/>
           </svg>
           Ver datos de PayPal ($)
         </button>
+
+        <a href="#" target="_blank" class="fix-link" id="waCorregir">¿Te equivocaste en algún dato? Avísanos por WhatsApp</a>
       </div>
 
       <!-- TARJETA 1: PAGO MÓVIL -->
@@ -385,12 +392,20 @@
     var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLu7e_Bo8P8Dnq0aSwiSDJe43mdxdQfSYQ5QXpNZ6KQb5voGG6lggB0v836Kq41VEk/exec';
     var TU_WHATSAPP = '584163080821';
     var CORREO_PAGOS = 'alexander1x33@gmail.com';
+    var STORAGE_KEY = 'canva_reg_bloqueo_v1';
+    var HORAS_BLOQUEO = 24;
+
     var params = new URLSearchParams(window.location.search);
     var HOJA_ACTUAL = params.get('hoja') || 'CANVAS';
 
+    // Llave de desbloqueo (?nuevo=1) por si el cliente necesita volver a llenar
+    if (params.get('nuevo') === '1') {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    }
+
     var tasaBCV = 0;
     var planActual = { plan: '1 mes', dias: 30, usd: 1 };
-    var datosCliente = { nombre: '', correo: '' };
+    var datosCliente = { nombre: '', whatsapp: '', correo: '' };
     var yaGuardado = false;
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -445,7 +460,11 @@
       document.getElementById('binanceMonto').textContent = '$' + planActual.usd + ' USDT';
       document.getElementById('paypalMonto').textContent = '$' + planActual.usd + ' USD';
 
-      if (yaGuardado) actualizarEnlacesWhatsApp();
+      if (yaGuardado) {
+        document.getElementById('savedText').textContent =
+          'Ya recibimos tu correo (' + datosCliente.correo + ') para tu plan de ' + planActual.plan + ' ($' + planActual.usd + ' / ' + calcularBsTexto(planActual.usd) + '). Elige tu método de pago:';
+        actualizarEnlacesWhatsApp();
+      }
     }
 
     function actualizarEnlacesWhatsApp() {
@@ -453,10 +472,12 @@
       var msgPM = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el Pago Móvil de ' + montoBs + ' ($' + planActual.usd + ' a tasa BCV) por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Aquí envío mi capture.';
       var msgBin = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por Binance de $' + planActual.usd + ' USDT al correo ' + CORREO_PAGOS + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Aquí envío mi capture.';
       var msgPay = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por PayPal de $' + planActual.usd + ' USD al correo ' + CORREO_PAGOS + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Aquí envío mi capture.';
+      var msgFix = 'Hola, soy ' + datosCliente.nombre + '. Me equivoqué en un dato al registrarme (correo puesto: ' + datosCliente.correo + '). ¿Me ayudas a corregirlo?';
 
       document.getElementById('waPagoMovil').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgPM);
       document.getElementById('waBinance').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgBin);
       document.getElementById('waPaypal').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgPay);
+      document.getElementById('waCorregir').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgFix);
     }
 
     function seleccionarPlan(btn, plan, dias, usd) {
@@ -468,6 +489,45 @@
       btn.classList.add('active');
       planActual = { plan: plan, dias: dias, usd: usd };
       actualizarResumen();
+    }
+
+    function bloquearFormularioUI() {
+      yaGuardado = true;
+      document.getElementById('nombre').value = datosCliente.nombre;
+      document.getElementById('whatsapp').value = datosCliente.whatsapp;
+      document.getElementById('correo').value = datosCliente.correo;
+      document.getElementById('nombre').disabled = true;
+      document.getElementById('whatsapp').disabled = true;
+      document.getElementById('correo').disabled = true;
+
+      var botonesPlan = document.querySelectorAll('.plan-btn');
+      for (var i = 0; i < botonesPlan.length; i++) {
+        botonesPlan[i].classList.remove('active');
+        if (botonesPlan[i].getAttribute('data-plan') === planActual.plan) {
+          botonesPlan[i].classList.add('active');
+        }
+        botonesPlan[i].disabled = true;
+      }
+
+      document.getElementById('btnGuardar').classList.add('hidden');
+      document.getElementById('savedSection').classList.remove('hidden');
+      actualizarResumen();
+    }
+
+    function verificarBloqueoPrevio() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        var reg = JSON.parse(raw);
+        var ahora = Date.now();
+        if (reg && reg.expira && ahora < reg.expira) {
+          datosCliente = reg.datosCliente || datosCliente;
+          planActual = reg.planActual || planActual;
+          bloquearFormularioUI();
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      } catch (e) {}
     }
 
     function mostrarError(msg) {
@@ -497,27 +557,21 @@
       }
       ocultarError();
 
-      // 1) Bloquea campos y muestra los métodos de pago AL INSTANTE
-      yaGuardado = true;
-      datosCliente = { nombre: nombre, correo: correo };
+      datosCliente = { nombre: nombre, whatsapp: whatsapp, correo: correo };
 
-      document.getElementById('nombre').disabled = true;
-      document.getElementById('whatsapp').disabled = true;
-      document.getElementById('correo').disabled = true;
-      var botonesPlan = document.querySelectorAll('.plan-btn');
-      for (var i = 0; i < botonesPlan.length; i++) {
-        botonesPlan[i].disabled = true;
-      }
+      // Guarda bloqueo por 24 horas en el navegador del cliente
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          expira: Date.now() + (HORAS_BLOQUEO * 60 * 60 * 1000),
+          datosCliente: datosCliente,
+          planActual: planActual
+        }));
+      } catch (e) {}
 
-      document.getElementById('btnGuardar').classList.add('hidden');
-      document.getElementById('savedText').textContent =
-        'Ya recibimos tu correo (' + correo + ') para tu plan de ' + planActual.plan + ' ($' + planActual.usd + ' / ' + calcularBsTexto(planActual.usd) + '). Elige tu método de pago:';
-      var savedSec = document.getElementById('savedSection');
-      savedSec.classList.remove('hidden');
-      actualizarEnlacesWhatsApp();
-      savedSec.scrollIntoView({ behavior: 'smooth' });
+      bloquearFormularioUI();
+      document.getElementById('savedSection').scrollIntoView({ behavior: 'smooth' });
 
-      // 2) Envía a Google Sheets en segundo plano sin hacer esperar al cliente
+      // Envía a Google Sheets en segundo plano
       var payload = {
         accion: 'guardar',
         hoja: HOJA_ACTUAL,
@@ -594,6 +648,7 @@
     }
 
     // Inicializar
+    verificarBloqueoPrevio();
     actualizarResumen();
     cargarTasaBCV();
 

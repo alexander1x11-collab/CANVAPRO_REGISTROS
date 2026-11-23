@@ -145,6 +145,7 @@
       width: 100%; padding: 13px; border: none; border-radius: 12px;
       font-size: 14.5px; font-weight: 700; cursor: pointer; transition: 0.2s;
       display: flex; align-items: center; justify-content: center; gap: 9px;
+      text-align: center;
     }
     .btn svg { width: 20px; height: 20px; flex-shrink: 0; }
     .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; }
@@ -154,6 +155,15 @@
     .btn-whatsapp {
       background: #25D366; color: #052e16;
       text-decoration: none;
+      box-shadow: 0 6px 18px rgba(37, 211, 102, 0.35);
+    }
+    .btn-whatsapp-locked {
+      background: #334155;
+      color: #94a3b8;
+      border: 1px solid #475569;
+      text-decoration: none;
+      cursor: not-allowed;
+      box-shadow: none;
     }
     .btn:disabled { opacity: 0.55; cursor: not-allowed; }
     .hidden { display: none !important; }
@@ -206,9 +216,67 @@
     }
     .warning-box {
       background: var(--warn-bg); border: 1.5px solid var(--danger);
-      color: #fecaca; border-radius: 12px; padding: 12px;
-      font-size: 13px; font-weight: 700; text-align: center;
+      color: #fecaca; border-radius: 12px; padding: 11px;
+      font-size: 12.5px; font-weight: 700; text-align: center;
       margin-bottom: 12px; line-height: 1.4;
+    }
+    /* CAJA DE SUBIDA DE COMPROBANTE */
+    label.upload-box {
+      display: block;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.75);
+      border: 2px dashed #64748b;
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: 0.2s;
+    }
+    label.upload-box:active { transform: scale(0.99); }
+    label.upload-box.has-file {
+      border-style: solid;
+      border-color: var(--success);
+      background: rgba(34, 197, 94, 0.1);
+    }
+    label.upload-box.need-file {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.12);
+    }
+    .upload-empty-icon { font-size: 26px; display: block; margin-bottom: 4px; }
+    .upload-empty strong { display: block; font-size: 13.5px; color: #f8fafc; margin-bottom: 3px; }
+    .upload-empty small { display: block; font-size: 11.5px; color: #94a3b8; font-weight: 500; }
+    .upload-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+    .upload-preview img {
+      width: 58px;
+      height: 58px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1.5px solid var(--success);
+      background: #0f172a;
+      flex-shrink: 0;
+    }
+    .upload-ok-text strong { display: block; font-size: 13.5px; color: #86efac; margin-bottom: 2px; }
+    .upload-ok-text small { display: block; font-size: 11.5px; color: #cbd5e1; font-weight: 500; line-height: 1.3; }
+    .upload-err {
+      color: #fca5a5;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-align: center;
+      margin: -4px 0 10px;
+    }
+    .wa-note {
+      display: block;
+      text-align: center;
+      font-size: 11.5px;
+      color: #86efac;
+      margin-top: 8px;
+      line-height: 1.35;
     }
     .error-msg {
       color: #fca5a5; font-size: 13px; margin-bottom: 10px;
@@ -360,12 +428,30 @@
         <button type="button" class="copy-all-btn" onclick="copiarTodoPM(this)">📋 Copiar todos los datos</button>
 
         <div class="warning-box">
-          ⚠️ IMPORTANTE: Realiza el Pago Móvil y luego pulsa el botón verde para enviarnos tu capture por WhatsApp.
+          ⚠️ PASO FINAL OBLIGATORIO: Realiza tu Pago Móvil y adjunta aquí el capture para activar el botón de WhatsApp.
         </div>
 
-        <a href="#" target="_blank" class="btn btn-whatsapp" id="waPagoMovil">
-          💬 Ya pagué — Enviar capture por WhatsApp
+        <input type="file" id="filePM" accept="image/*" class="hidden" onchange="manejarCapture(this, 'pm')" />
+        <label for="filePM" class="upload-box" id="uploadBoxPM">
+          <div id="uploadEmptyPM" class="upload-empty">
+            <span class="upload-empty-icon">📸</span>
+            <strong>Toca aquí para adjuntar tu comprobante</strong>
+            <small>Requerido para activar el envío a WhatsApp</small>
+          </div>
+          <div id="uploadPreviewPM" class="upload-preview hidden">
+            <img id="imgPreviewPM" src="" alt="Comprobante" />
+            <div class="upload-ok-text">
+              <strong>✅ Comprobante cargado</strong>
+              <small id="fileNamePM">Listo para enviar (toca si deseas cambiarlo)</small>
+            </div>
+          </div>
+        </label>
+        <div id="uploadErrPM" class="upload-err hidden"></div>
+
+        <a href="#" target="_blank" class="btn btn-whatsapp-locked" id="waPagoMovil" onclick="return validarEnvioWA(event, 'pm')">
+          🔒 Adjunta tu capture para activar WhatsApp
         </a>
+        <span id="waNotePM" class="wa-note hidden">📲 Al abrir WhatsApp, recuerda adjuntar también esta foto en el chat.</span>
       </div>
 
       <!-- TARJETA 2: BINANCE -->
@@ -392,12 +478,30 @@
         </div>
 
         <div class="warning-box">
-          ⚠️ IMPORTANTE: Envía el pago por Binance Pay y luego pulsa el botón verde para enviarnos tu capture por WhatsApp.
+          ⚠️ PASO FINAL OBLIGATORIO: Envía tu pago por Binance Pay y adjunta aquí el capture para activar el botón de WhatsApp.
         </div>
 
-        <a href="#" target="_blank" class="btn btn-whatsapp" id="waBinance">
-          💬 Ya pagué por Binance — Enviar capture
+        <input type="file" id="fileBin" accept="image/*" class="hidden" onchange="manejarCapture(this, 'bin')" />
+        <label for="fileBin" class="upload-box" id="uploadBoxBin">
+          <div id="uploadEmptyBin" class="upload-empty">
+            <span class="upload-empty-icon">📸</span>
+            <strong>Toca aquí para adjuntar tu comprobante</strong>
+            <small>Requerido para activar el envío a WhatsApp</small>
+          </div>
+          <div id="uploadPreviewBin" class="upload-preview hidden">
+            <img id="imgPreviewBin" src="" alt="Comprobante" />
+            <div class="upload-ok-text">
+              <strong>✅ Comprobante cargado</strong>
+              <small id="fileNameBin">Listo para enviar (toca si deseas cambiarlo)</small>
+            </div>
+          </div>
+        </label>
+        <div id="uploadErrBin" class="upload-err hidden"></div>
+
+        <a href="#" target="_blank" class="btn btn-whatsapp-locked" id="waBinance" onclick="return validarEnvioWA(event, 'bin')">
+          🔒 Adjunta tu capture para activar WhatsApp
         </a>
+        <span id="waNoteBin" class="wa-note hidden">📲 Al abrir WhatsApp, recuerda adjuntar también esta foto en el chat.</span>
       </div>
 
       <!-- TARJETA 3: PAYPAL -->
@@ -420,12 +524,30 @@
         </div>
 
         <div class="warning-box">
-          ⚠️ IMPORTANTE: Realiza el pago por PayPal y luego pulsa el botón verde para enviarnos tu capture por WhatsApp.
+          ⚠️ PASO FINAL OBLIGATORIO: Realiza tu pago por PayPal y adjunta aquí el capture para activar el botón de WhatsApp.
         </div>
 
-        <a href="#" target="_blank" class="btn btn-whatsapp" id="waPaypal">
-          💬 Ya pagué por PayPal — Enviar capture
+        <input type="file" id="filePay" accept="image/*" class="hidden" onchange="manejarCapture(this, 'pay')" />
+        <label for="filePay" class="upload-box" id="uploadBoxPay">
+          <div id="uploadEmptyPay" class="upload-empty">
+            <span class="upload-empty-icon">📸</span>
+            <strong>Toca aquí para adjuntar tu comprobante</strong>
+            <small>Requerido para activar el envío a WhatsApp</small>
+          </div>
+          <div id="uploadPreviewPay" class="upload-preview hidden">
+            <img id="imgPreviewPay" src="" alt="Comprobante" />
+            <div class="upload-ok-text">
+              <strong>✅ Comprobante cargado</strong>
+              <small id="fileNamePay">Listo para enviar (toca si deseas cambiarlo)</small>
+            </div>
+          </div>
+        </label>
+        <div id="uploadErrPay" class="upload-err hidden"></div>
+
+        <a href="#" target="_blank" class="btn btn-whatsapp-locked" id="waPaypal" onclick="return validarEnvioWA(event, 'pay')">
+          🔒 Adjunta tu capture para activar WhatsApp
         </a>
+        <span id="waNotePay" class="wa-note hidden">📲 Al abrir WhatsApp, recuerda adjuntar también esta foto en el chat.</span>
       </div>
     </div>
 
@@ -469,6 +591,45 @@
     var yaGuardado = false;
     var intervaloSesion = null;
     var intervaloCooldown = null;
+
+    var capturasCargadas = { pm: false, bin: false, pay: false };
+    var urlsPreview = { pm: '', bin: '', pay: '' };
+
+    var MAPA_UI = {
+      pm: {
+        box: 'uploadBoxPM',
+        empty: 'uploadEmptyPM',
+        preview: 'uploadPreviewPM',
+        img: 'imgPreviewPM',
+        name: 'fileNamePM',
+        err: 'uploadErrPM',
+        btn: 'waPagoMovil',
+        note: 'waNotePM',
+        textoActivo: '💬 Ya pagué — Enviar capture por WhatsApp'
+      },
+      bin: {
+        box: 'uploadBoxBin',
+        empty: 'uploadEmptyBin',
+        preview: 'uploadPreviewBin',
+        img: 'imgPreviewBin',
+        name: 'fileNameBin',
+        err: 'uploadErrBin',
+        btn: 'waBinance',
+        note: 'waNoteBin',
+        textoActivo: '💬 Ya pagué por Binance — Enviar capture'
+      },
+      pay: {
+        box: 'uploadBoxPay',
+        empty: 'uploadEmptyPay',
+        preview: 'uploadPreviewPay',
+        img: 'imgPreviewPay',
+        name: 'fileNamePay',
+        err: 'uploadErrPay',
+        btn: 'waPaypal',
+        note: 'waNotePay',
+        textoActivo: '💬 Ya pagué por PayPal — Enviar capture'
+      }
+    };
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
     function formatDMY(d) { return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear(); }
@@ -540,6 +701,79 @@
       document.getElementById('waBinance').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgBin);
       document.getElementById('waPaypal').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgPay);
       document.getElementById('waCorregir').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgFix);
+    }
+
+    function manejarCapture(input, tipo) {
+      var ui = MAPA_UI[tipo];
+      if (!ui) return;
+
+      var file = input.files && input.files[0];
+      if (!file) return;
+
+      var errEl = document.getElementById(ui.err);
+      var boxEl = document.getElementById(ui.box);
+
+      if (file.type && file.type.indexOf('image/') !== 0) {
+        errEl.textContent = '⚠️ Por favor selecciona una imagen (capture de pago).';
+        errEl.classList.remove('hidden');
+        boxEl.classList.add('need-file');
+        return;
+      }
+
+      errEl.classList.add('hidden');
+      boxEl.classList.remove('need-file');
+      boxEl.classList.add('has-file');
+
+      var imgEl = document.getElementById(ui.img);
+      try {
+        if (urlsPreview[tipo] && window.URL && window.URL.revokeObjectURL) {
+          window.URL.revokeObjectURL(urlsPreview[tipo]);
+        }
+        if (window.URL && window.URL.createObjectURL) {
+          urlsPreview[tipo] = window.URL.createObjectURL(file);
+          imgEl.src = urlsPreview[tipo];
+          imgEl.classList.remove('hidden');
+        } else {
+          imgEl.classList.add('hidden');
+        }
+      } catch (e) {
+        imgEl.classList.add('hidden');
+      }
+
+      var nombreArchivo = file.name || 'Comprobante';
+      if (nombreArchivo.length > 26) {
+        nombreArchivo = nombreArchivo.slice(0, 23) + '...';
+      }
+      document.getElementById(ui.name).textContent = nombreArchivo + ' • Toca para cambiar';
+      document.getElementById(ui.empty).classList.add('hidden');
+      document.getElementById(ui.preview).classList.remove('hidden');
+
+      capturasCargadas[tipo] = true;
+
+      var btnWA = document.getElementById(ui.btn);
+      btnWA.classList.remove('btn-whatsapp-locked');
+      btnWA.classList.add('btn-whatsapp');
+      btnWA.textContent = ui.textoActivo;
+      document.getElementById(ui.note).classList.remove('hidden');
+    }
+
+    function validarEnvioWA(e, tipo) {
+      if (capturasCargadas[tipo]) {
+        actualizarEnlacesWhatsApp();
+        return true;
+      }
+
+      e.preventDefault();
+      var ui = MAPA_UI[tipo];
+      if (ui) {
+        var boxEl = document.getElementById(ui.box);
+        var errEl = document.getElementById(ui.err);
+        boxEl.classList.add('need-file');
+        errEl.textContent = '⚠️ Primero debes subir la foto de tu comprobante arriba.';
+        errEl.classList.remove('hidden');
+        boxEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return false;
     }
 
     function seleccionarPlan(btn, plan, dias, usd) {

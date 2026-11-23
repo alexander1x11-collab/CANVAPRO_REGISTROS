@@ -16,6 +16,8 @@
       --accent: #7d2ae8;
       --success: #22c55e;
       --danger: #ef4444;
+      --binance: #f3ba2f;
+      --paypal: #0070ba;
       --warn-bg: rgba(239, 68, 68, 0.14);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -41,7 +43,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       gap: 10px;
     }
     .brand { display: flex; align-items: center; gap: 10px; }
@@ -63,6 +65,17 @@
       font-weight: 700;
       white-space: nowrap;
     }
+    .bcv-bar {
+      background: rgba(0, 196, 204, 0.12);
+      border: 1px solid rgba(0, 196, 204, 0.35);
+      color: #67e8f9;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 14px;
+    }
     .field { margin-bottom: 14px; }
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #e2e8f0; }
     .hint { font-size: 11.5px; color: #fbbf24; margin-top: 4px; display: block; }
@@ -76,7 +89,7 @@
     .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px; }
     .plan-btn {
       background: var(--card-2); border: 2px solid var(--border);
-      border-radius: 12px; padding: 12px 6px; color: var(--text);
+      border-radius: 12px; padding: 10px 6px; color: var(--text);
       cursor: pointer; text-align: center; transition: 0.2s;
     }
     .plan-btn.active {
@@ -85,8 +98,9 @@
       box-shadow: 0 0 0 2px rgba(0, 196, 204, 0.2);
     }
     .plan-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .plan-title { font-size: 13px; font-weight: 700; display: block; }
-    .plan-price { font-size: 15px; font-weight: 800; color: var(--primary); margin-top: 4px; display: block; }
+    .plan-title { font-size: 12.5px; font-weight: 700; display: block; }
+    .plan-usd { font-size: 17px; font-weight: 800; color: var(--primary); margin-top: 3px; display: block; }
+    .plan-bs { font-size: 11px; color: #cbd5e1; margin-top: 2px; display: block; font-weight: 600; }
     .summary {
       background: var(--card-2); border: 1px solid var(--border);
       border-radius: 12px; padding: 12px; margin: 14px 0;
@@ -95,11 +109,13 @@
     .summary div span { color: var(--muted); display: block; font-size: 11px; }
     .summary div strong { color: #fff; font-size: 13.5px; }
     .btn {
-      width: 100%; padding: 14px; border: none; border-radius: 12px;
-      font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s;
+      width: 100%; padding: 13px; border: none; border-radius: 12px;
+      font-size: 14.5px; font-weight: 700; cursor: pointer; transition: 0.2s;
     }
     .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; }
-    .btn-success { background: var(--success); color: #052e16; }
+    .btn-pm { background: var(--success); color: #052e16; margin-bottom: 8px; }
+    .btn-binance { background: var(--binance); color: #1e2026; margin-bottom: 8px; }
+    .btn-paypal { background: var(--paypal); color: #ffffff; }
     .btn-whatsapp {
       background: #25D366; color: #052e16;
       text-decoration: none; display: block; text-align: center;
@@ -118,16 +134,20 @@
     .saved-box p { color: #e2e8f0; font-size: 13px; line-height: 1.45; margin-bottom: 12px; }
     .pay-card {
       margin-top: 14px; background: var(--card-2);
-      border: 1px solid var(--primary); border-radius: 14px; padding: 14px;
+      border: 1.5px solid var(--primary); border-radius: 14px; padding: 14px;
     }
+    .pay-card.binance-card { border-color: var(--binance); }
+    .pay-card.paypal-card { border-color: var(--paypal); }
     .pay-title { font-size: 15px; font-weight: 800; margin-bottom: 10px; color: var(--primary); text-align: center; }
+    .binance-card .pay-title { color: var(--binance); }
+    .paypal-card .pay-title { color: #38bdf8; }
     .copy-row {
       display: flex; justify-content: space-between; align-items: center;
       padding: 9px 10px; background: var(--card); border-radius: 10px;
       margin-bottom: 8px; border: 1px solid var(--border); gap: 8px;
     }
     .copy-row small { color: var(--muted); display: block; font-size: 11px; }
-    .copy-row strong { font-size: 14px; color: #fff; }
+    .copy-row strong { font-size: 14px; color: #fff; word-break: break-all; }
     .copy-btn {
       background: #334155; color: #fff; border: none; border-radius: 8px;
       padding: 7px 11px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
@@ -167,6 +187,8 @@
       <div class="timer" id="timer">⏳ 30:00</div>
     </div>
 
+    <div class="bcv-bar" id="bcvBar">🏦 Cargando tasa oficial del BCV...</div>
+
     <div id="formSection">
       <div class="field">
         <label for="nombre">Nombre y Apellido</label>
@@ -187,17 +209,20 @@
       <div class="field">
         <label>Selecciona tu plan</label>
         <div class="plans">
-          <button type="button" class="plan-btn active" onclick="seleccionarPlan(this, '1 mes', 30, '900', '900 Bs')">
+          <button type="button" class="plan-btn active" onclick="seleccionarPlan(this, '1 mes', 30, 1)">
             <span class="plan-title">1 Mes</span>
-            <span class="plan-price">900 Bs</span>
+            <span class="plan-usd">$1</span>
+            <span class="plan-bs" id="bsPlan1">Cargando...</span>
           </button>
-          <button type="button" class="plan-btn" onclick="seleccionarPlan(this, '3 meses', 90, '1800', '1.800 Bs')">
+          <button type="button" class="plan-btn" onclick="seleccionarPlan(this, '3 meses', 90, 2)">
             <span class="plan-title">3 Meses</span>
-            <span class="plan-price">1.800 Bs</span>
+            <span class="plan-usd">$2</span>
+            <span class="plan-bs" id="bsPlan2">Cargando...</span>
           </button>
-          <button type="button" class="plan-btn" onclick="seleccionarPlan(this, '1 año', 365, '2600', '2.600 Bs')">
+          <button type="button" class="plan-btn" onclick="seleccionarPlan(this, '1 año', 365, 3)">
             <span class="plan-title">1 Año</span>
-            <span class="plan-price">2.600 Bs</span>
+            <span class="plan-usd">$3</span>
+            <span class="plan-bs" id="bsPlan3">Cargando...</span>
           </button>
         </div>
       </div>
@@ -205,8 +230,8 @@
       <div class="summary">
         <div><span>Fecha de inicio</span><strong id="sumInicio">--</strong></div>
         <div><span>Fecha de vencimiento</span><strong id="sumFin">--</strong></div>
-        <div><span>Duración</span><strong id="sumDias">30 días</strong></div>
-        <div><span>Monto a pagar</span><strong id="sumMonto" style="color:#00c4cc;">900 Bs</strong></div>
+        <div><span>Monto en Dólares</span><strong id="sumUsd" style="color:#f3ba2f;">$1 USD</strong></div>
+        <div><span>Monto en Bs (BCV)</span><strong id="sumBs" style="color:#00c4cc;">--</strong></div>
       </div>
 
       <div id="errorMsg" class="error-msg hidden"></div>
@@ -216,18 +241,24 @@
         💾 Guardar datos y pedir invitación
       </button>
 
-      <!-- PASO 2: CONFIRMACIÓN + BOTÓN PARA VER PAGO MÓVIL -->
+      <!-- PASO 2: ELEGIR MÉTODO DE PAGO -->
       <div id="savedSection" class="saved-box hidden">
         <h3>✅ ¡Datos guardados con éxito!</h3>
-        <p id="savedText">Ya recibimos tu correo para enviarte la invitación de Canva Pro. Cuando revises tu correo y confirmes el acceso, pulsa abajo para ver los datos de pago.</p>
-        <button type="button" class="btn btn-success" id="btnVerPago" onclick="mostrarPagoMovil()">
-          📲 Ver datos de Pago Móvil
+        <p id="savedText">Ya recibimos tu correo para enviarte la invitación de Canva Pro. Elige cómo deseas pagar:</p>
+        <button type="button" class="btn btn-pm" onclick="mostrarMetodo('pagomovil')">
+          📲 Ver datos de Pago Móvil (Bs)
+        </button>
+        <button type="button" class="btn btn-binance" onclick="mostrarMetodo('binance')">
+          🟡 Ver datos de Binance ($)
+        </button>
+        <button type="button" class="btn btn-paypal" onclick="mostrarMetodo('paypal')">
+          🔵 Ver datos de PayPal ($)
         </button>
       </div>
 
-      <!-- PASO 3: DATOS DE PAGO MÓVIL + ENVIAR CAPTURE -->
-      <div id="paySection" class="pay-card hidden">
-        <div class="pay-title">📲 Datos de Pago Móvil</div>
+      <!-- TARJETA 1: PAGO MÓVIL -->
+      <div id="cardPagoMovil" class="pay-card hidden">
+        <div class="pay-title">📲 Datos de Pago Móvil (Bs)</div>
 
         <div class="copy-row">
           <div><small>Banco</small><strong>BANESCO (0134)</strong></div>
@@ -245,18 +276,64 @@
         </div>
 
         <div class="copy-row">
-          <div><small>Monto exacto</small><strong id="payMonto">900 Bs</strong></div>
-          <button type="button" class="copy-btn" id="btnCopyMonto" onclick="copiarMonto(this)">Copiar</button>
+          <div><small>Monto exacto (Tasa BCV)</small><strong id="pmMonto">--</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarMontoBs(this)">Copiar</button>
         </div>
 
-        <button type="button" class="copy-all-btn" onclick="copiarTodo(this)">📋 Copiar todos los datos</button>
+        <button type="button" class="copy-all-btn" onclick="copiarTodoPM(this)">📋 Copiar todos los datos</button>
 
         <div class="warning-box">
           ⚠️ IMPORTANTE: Realiza el Pago Móvil y luego pulsa el botón verde para enviarnos tu capture por WhatsApp.
         </div>
 
-        <a href="#" target="_blank" class="btn btn-whatsapp" id="btnWhatsapp">
+        <a href="#" target="_blank" class="btn btn-whatsapp" id="waPagoMovil">
           💬 Ya pagué — Enviar capture por WhatsApp
+        </a>
+      </div>
+
+      <!-- TARJETA 2: BINANCE -->
+      <div id="cardBinance" class="pay-card binance-card hidden">
+        <div class="pay-title">🟡 Datos de Binance Pay ($)</div>
+
+        <div class="copy-row">
+          <div><small>Correo de Binance</small><strong>alexander1x33@gmail.com</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarTexto('alexander1x33@gmail.com', this)">Copiar</button>
+        </div>
+
+        <div class="copy-row">
+          <div><small>Monto exacto</small><strong id="binanceMonto">$1 USDT</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarMontoUsd(this)">Copiar</button>
+        </div>
+
+        <div class="warning-box">
+          ⚠️ IMPORTANTE: Envía el pago por Binance Pay y luego pulsa el botón verde para enviarnos tu capture por WhatsApp.
+        </div>
+
+        <a href="#" target="_blank" class="btn btn-whatsapp" id="waBinance">
+          💬 Ya pagué por Binance — Enviar capture
+        </a>
+      </div>
+
+      <!-- TARJETA 3: PAYPAL -->
+      <div id="cardPaypal" class="pay-card paypal-card hidden">
+        <div class="pay-title">🔵 Datos de PayPal ($)</div>
+
+        <div class="copy-row">
+          <div><small>Correo de PayPal</small><strong>alexander1x33@gmail.com</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarTexto('alexander1x33@gmail.com', this)">Copiar</button>
+        </div>
+
+        <div class="copy-row">
+          <div><small>Monto exacto</small><strong id="paypalMonto">$1 USD</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarMontoUsd(this)">Copiar</button>
+        </div>
+
+        <div class="warning-box">
+          ⚠️ IMPORTANTE: Realiza el pago por PayPal y luego pulsa el botón verde para enviarnos tu capture por WhatsApp.
+        </div>
+
+        <a href="#" target="_blank" class="btn btn-whatsapp" id="waPaypal">
+          💬 Ya pagué por PayPal — Enviar capture
         </a>
       </div>
     </div>
@@ -271,22 +348,47 @@
   <script>
     var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLu7e_Bo8P8Dnq0aSwiSDJe43mdxdQfSYQ5QXpNZ6KQb5voGG6lggB0v836Kq41VEk/exec';
     var TU_WHATSAPP = '584163080821';
+    var CORREO_PAGOS = 'alexander1x33@gmail.com';
     var params = new URLSearchParams(window.location.search);
     var HOJA_ACTUAL = params.get('hoja') || 'CANVAS';
 
-    var planActual = { plan: '1 mes', dias: 30, precio: '900', precioTxt: '900 Bs' };
+    var tasaBCV = 0;
+    var planActual = { plan: '1 mes', dias: 30, usd: 1 };
+    var datosCliente = { nombre: '', correo: '' };
     var yaGuardado = false;
 
-    function pad(n) {
-      return n < 10 ? '0' + n : '' + n;
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    function formatDMY(d) { return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear(); }
+    function formatISO(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+
+    function calcularBsNumero(usd) {
+      if (!tasaBCV || tasaBCV <= 0) return '';
+      return (usd * tasaBCV).toFixed(2);
     }
 
-    function formatDMY(d) {
-      return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear();
+    function calcularBsTexto(usd) {
+      var num = calcularBsNumero(usd);
+      if (!num) return 'Consultar tasa';
+      return num.replace('.', ',') + ' Bs';
     }
 
-    function formatISO(d) {
-      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    function cargarTasaBCV() {
+      fetch('https://ve.dolarapi.com/v1/dolares/oficial')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var val = Number(data.promedio || data.venta || data.compra || 0);
+          if (val > 0) {
+            tasaBCV = val;
+            document.getElementById('bcvBar').textContent = '🏦 Tasa Oficial BCV hoy: ' + tasaBCV.toFixed(2).replace('.', ',') + ' Bs';
+            actualizarResumen();
+          } else {
+            throw new Error('Sin tasa');
+          }
+        })
+        .catch(function() {
+          document.getElementById('bcvBar').textContent = '🏦 Tasa BCV no disponible ahora (puedes pagar en $ o consultar por WhatsApp)';
+          actualizarResumen();
+        });
     }
 
     function actualizarResumen() {
@@ -294,21 +396,41 @@
       var fin = new Date(hoy.getTime());
       fin.setDate(fin.getDate() + planActual.dias);
 
+      document.getElementById('bsPlan1').textContent = tasaBCV > 0 ? calcularBsTexto(1) : 'Tasa BCV';
+      document.getElementById('bsPlan2').textContent = tasaBCV > 0 ? calcularBsTexto(2) : 'Tasa BCV';
+      document.getElementById('bsPlan3').textContent = tasaBCV > 0 ? calcularBsTexto(3) : 'Tasa BCV';
+
       document.getElementById('sumInicio').textContent = formatDMY(hoy);
       document.getElementById('sumFin').textContent = formatDMY(fin);
-      document.getElementById('sumDias').textContent = planActual.dias + ' días';
-      document.getElementById('sumMonto').textContent = planActual.precioTxt;
-      document.getElementById('payMonto').textContent = planActual.precioTxt;
+      document.getElementById('sumUsd').textContent = '$' + planActual.usd + ' USD';
+      document.getElementById('sumBs').textContent = calcularBsTexto(planActual.usd);
+
+      document.getElementById('pmMonto').textContent = calcularBsTexto(planActual.usd);
+      document.getElementById('binanceMonto').textContent = '$' + planActual.usd + ' USDT';
+      document.getElementById('paypalMonto').textContent = '$' + planActual.usd + ' USD';
+
+      if (yaGuardado) actualizarEnlacesWhatsApp();
     }
 
-    function seleccionarPlan(btn, plan, dias, precio, precioTxt) {
+    function actualizarEnlacesWhatsApp() {
+      var montoBs = calcularBsTexto(planActual.usd);
+      var msgPM = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el Pago Móvil de ' + montoBs + ' ($' + planActual.usd + ' a tasa BCV) por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Aquí envío mi capture.';
+      var msgBin = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por Binance de $' + planActual.usd + ' USDT al correo ' + CORREO_PAGOS + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Aquí envío mi capture.';
+      var msgPay = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por PayPal de $' + planActual.usd + ' USD al correo ' + CORREO_PAGOS + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Aquí envío mi capture.';
+
+      document.getElementById('waPagoMovil').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgPM);
+      document.getElementById('waBinance').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgBin);
+      document.getElementById('waPaypal').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgPay);
+    }
+
+    function seleccionarPlan(btn, plan, dias, usd) {
       if (yaGuardado) return;
       var botones = document.querySelectorAll('.plan-btn');
       for (var i = 0; i < botones.length; i++) {
         botones[i].classList.remove('active');
       }
       btn.classList.add('active');
-      planActual = { plan: plan, dias: dias, precio: precio, precioTxt: precioTxt };
+      planActual = { plan: plan, dias: dias, usd: usd };
       actualizarResumen();
     }
 
@@ -366,6 +488,8 @@
         if (!json.ok) throw new Error(json.error || 'Error al guardar');
 
         yaGuardado = true;
+        datosCliente = { nombre: nombre, correo: correo };
+
         document.getElementById('nombre').disabled = true;
         document.getElementById('whatsapp').disabled = true;
         document.getElementById('correo').disabled = true;
@@ -376,11 +500,9 @@
 
         btn.classList.add('hidden');
         document.getElementById('savedText').textContent =
-          'Ya recibimos tu correo (' + correo + ') para enviarte la invitación de Canva Pro (' + planActual.plan + '). Cuando verifiques tu acceso, pulsa abajo para ver los datos de Pago Móvil.';
+          'Ya recibimos tu correo (' + correo + ') para tu plan de ' + planActual.plan + ' ($' + planActual.usd + ' / ' + calcularBsTexto(planActual.usd) + '). Elige tu método de pago:';
         document.getElementById('savedSection').classList.remove('hidden');
-
-        var msgWA = 'Hola, soy ' + nombre + '. Ya verifiqué mi acceso y realicé el Pago Móvil de ' + planActual.precioTxt + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo es: ' + correo + '. Aquí envío mi capture.';
-        document.getElementById('btnWhatsapp').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgWA);
+        actualizarEnlacesWhatsApp();
       })
       .catch(function() {
         mostrarError('No se pudo conectar. Intenta de nuevo en unos segundos.');
@@ -389,10 +511,15 @@
       });
     }
 
-    function mostrarPagoMovil() {
-      var pay = document.getElementById('paySection');
-      pay.classList.remove('hidden');
-      pay.scrollIntoView({ behavior: 'smooth' });
+    function mostrarMetodo(tipo) {
+      document.getElementById('cardPagoMovil').classList.add('hidden');
+      document.getElementById('cardBinance').classList.add('hidden');
+      document.getElementById('cardPaypal').classList.add('hidden');
+
+      var targetId = tipo === 'pagomovil' ? 'cardPagoMovil' : (tipo === 'binance' ? 'cardBinance' : 'cardPaypal');
+      var card = document.getElementById(targetId);
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth' });
     }
 
     function copiarTexto(texto, btn) {
@@ -412,12 +539,17 @@
       }
     }
 
-    function copiarMonto(btn) {
-      copiarTexto(planActual.precio, btn);
+    function copiarMontoBs(btn) {
+      var val = calcularBsNumero(planActual.usd) || 'Consultar';
+      copiarTexto(val, btn);
     }
 
-    function copiarTodo(btn) {
-      var texto = 'Pago Móvil\nBanco: BANESCO (0134)\nCédula: 18440290\nTeléfono: 04143115685\nMonto: ' + planActual.precioTxt;
+    function copiarMontoUsd(btn) {
+      copiarTexto(String(planActual.usd), btn);
+    }
+
+    function copiarTodoPM(btn) {
+      var texto = 'Pago Móvil\nBanco: BANESCO (0134)\nCédula: 18440290\nTeléfono: 04143115685\nMonto: ' + calcularBsTexto(planActual.usd);
       copiarTexto(texto, btn);
     }
 
@@ -431,8 +563,9 @@
       cb();
     }
 
-    // Inicia fechas y reloj al cargar
+    // Inicializar
     actualizarResumen();
+    cargarTasaBCV();
 
     var segundos = 30 * 60;
     var timerEl = document.getElementById('timer');

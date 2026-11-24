@@ -8,6 +8,8 @@
   <meta property="og:description" content="Calcula tu plan a tasa BCV de hoy y obtén los datos de pago al instante. Sin contraseñas." />
   <meta property="og:image" content="https://canva-pro-registros.pages.dev/bienvenida.jfif" />
   <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
   <style>
     :root {
       --bg: #0f172a;
@@ -220,7 +222,6 @@
       font-size: 12.5px; font-weight: 700; text-align: center;
       margin-bottom: 12px; line-height: 1.4;
     }
-    /* CAJA DE SUBIDA DE COMPROBANTE */
     label.upload-box {
       display: block;
       width: 100%;
@@ -331,7 +332,7 @@
 
       <div class="field">
         <label for="correo">Correo exacto que usarás en Canva</label>
-        <input type="email" id="correo" placeholder="Ej: tucorreo@gmail.com" autocomplete="email" />
+        <input type="email" id="correo" placeholder="Ej: tucorreo@gmail.com" autocomplete="email" onfocus="precalentarServidor(false)" />
         <span class="hint">⚠️ Escríbelo bien: a este correo te llegará la invitación de Canva Pro.</span>
       </div>
 
@@ -591,6 +592,8 @@
     var yaGuardado = false;
     var intervaloSesion = null;
     var intervaloCooldown = null;
+    var ultimoPrecalentamiento = 0;
+    var payloadPendienteBeacon = null;
 
     var capturasCargadas = { pm: false, bin: false, pay: false };
     var urlsPreview = { pm: '', bin: '', pay: '' };
@@ -634,6 +637,16 @@
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
     function formatDMY(d) { return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear(); }
     function formatISO(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+
+    function precalentarServidor(forzar) {
+      var ahora = Date.now();
+      if (!forzar && (ahora - ultimoPrecalentamiento) < 40000) return;
+      ultimoPrecalentamiento = ahora;
+      fetch(SCRIPT_URL + '?modo=cliente&hoja=' + encodeURIComponent(HOJA_ACTUAL) + '&_w=' + ahora, {
+        method: 'GET',
+        cache: 'no-store'
+      }).catch(function() {});
+    }
 
     function calcularBsNumero(usd) {
       if (!tasaBCV || tasaBCV <= 0) return '';
@@ -943,6 +956,38 @@
       document.getElementById('errorMsg').classList.add('hidden');
     }
 
+    function enviarRegistroConReintento(payloadStr, intento) {
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: payloadStr
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        payloadPendienteBeacon = null;
+      })
+      .catch(function(err) {
+        console.log('Reintento envío (' + intento + '):', err);
+        if (intento < 2) {
+          setTimeout(function() {
+            enviarRegistroConReintento(payloadStr, intento + 1);
+          }, 1500);
+        }
+      });
+    }
+
+    window.addEventListener('pagehide', function() {
+      if (payloadPendienteBeacon && navigator.sendBeacon) {
+        try {
+          var blob = new Blob([payloadPendienteBeacon], { type: 'text/plain;charset=utf-8' });
+          navigator.sendBeacon(SCRIPT_URL, blob);
+          payloadPendienteBeacon = null;
+        } catch (e) {}
+      }
+    });
+
     function guardarDatosCliente() {
       if (yaGuardado) return;
 
@@ -973,7 +1018,7 @@
       bloquearFormularioUI();
       document.getElementById('savedSection').scrollIntoView({ behavior: 'smooth' });
 
-      var payload = {
+      var payloadStr = JSON.stringify({
         accion: 'guardar',
         hoja: HOJA_ACTUAL,
         esCliente: true,
@@ -984,16 +1029,10 @@
           plan: planActual.plan,
           inicio: formatISO(new Date())
         }
-      };
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-        keepalive: true
-      }).catch(function(err) {
-        console.log('Error en segundo plano:', err);
       });
+
+      payloadPendienteBeacon = payloadStr;
+      enviarRegistroConReintento(payloadStr, 1);
     }
 
     function mostrarMetodo(tipo) {
@@ -1053,6 +1092,7 @@
     actualizarResumen();
     cargarTasaBCV();
     iniciarControlTiempo();
+    precalentarServidor(true);
   </script>
 </body>
 </html>

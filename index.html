@@ -240,10 +240,31 @@
       background: rgba(239, 68, 68, 0.1);
     }
     .ref-box label {
-      font-size: 12.5px;
+      font-size: 13px;
       color: #f8fafc;
       margin-bottom: 6px;
       display: block;
+      text-align: center;
+    }
+    .ref-example {
+      background: rgba(0, 196, 204, 0.1);
+      border: 1px dashed rgba(0, 196, 204, 0.45);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 11.5px;
+      color: #cbd5e1;
+      text-align: center;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+    .ref-example .dim { color: #64748b; }
+    .ref-example .hl {
+      color: #67e8f9;
+      font-weight: 800;
+      background: rgba(0, 196, 204, 0.18);
+      padding: 1px 5px;
+      border-radius: 4px;
+      letter-spacing: 1px;
     }
     .ref-input {
       text-align: center;
@@ -254,6 +275,12 @@
       border: 1.5px solid var(--border);
       padding: 11px 12px;
       text-transform: uppercase;
+    }
+    .ref-input::placeholder {
+      font-size: 14px;
+      letter-spacing: 1px;
+      font-weight: 600;
+      color: #64748b;
     }
     .ref-msg {
       display: block;
@@ -492,25 +519,28 @@
         <button type="button" class="copy-all-btn" onclick="copiarTodoPM(this)">📋 Copiar todos los datos</button>
 
         <div class="warning-box">
-          ⚠️ PASO FINAL OBLIGATORIO: Realiza tu Pago Móvil y escribe abajo los <strong>últimos 6 dígitos de la referencia</strong> para confirmar tu pago.
+          ⚠️ PASO FINAL: Realiza tu Pago Móvil y escribe abajo los <strong>últimos 6 números del recibo de pago</strong> para confirmar.
         </div>
 
         <div class="ref-box" id="refBoxPM">
-          <label for="refPM">🔢 Últimos 6 dígitos de referencia del Pago Móvil</label>
+          <label for="refPM">🧾 Últimos 6 números del recibo (Referencia / Operación)</label>
+          <div class="ref-example">
+            Ejemplo: si tu recibo dice Ref: <span class="dim">0048</span><span class="hl">291054</span> → escribe solo <span class="hl">291054</span>
+          </div>
           <input
             type="tel"
             inputmode="numeric"
             maxlength="6"
             id="refPM"
             class="ref-input"
-            placeholder="000000"
+            placeholder="Ej: 291054"
             oninput="validarReferenciaEnVivo('pm')"
           />
-          <span class="ref-msg" id="refMsgPM">Ingresa los últimos 6 números exactos de tu comprobante bancario.</span>
+          <span class="ref-msg" id="refMsgPM">Búscalo en el capture de tu banco como Referencia, Operación o Comprobante.</span>
         </div>
 
         <button type="button" class="btn btn-whatsapp-locked" id="waPagoMovil" onclick="intentarConfirmarPago('pm')">
-          🔒 Escribe los 6 dígitos de referencia para continuar
+          🔒 Escribe los últimos 6 números del recibo
         </button>
 
         <div id="inviteBannerPM" class="invite-banner hidden">
@@ -542,24 +572,27 @@
         </div>
 
         <div class="warning-box">
-          ⚠️ PASO FINAL OBLIGATORIO: Envía tu pago por Binance Pay y escribe abajo los <strong>últimos 6 dígitos del ID de orden</strong> para confirmar.
+          ⚠️ PASO FINAL: Envía tu pago por Binance Pay y escribe abajo los <strong>últimos 6 dígitos del ID de orden</strong> para confirmar.
         </div>
 
         <div class="ref-box" id="refBoxBin">
-          <label for="refBin">🔢 Últimos 6 dígitos del ID de orden Binance</label>
+          <label for="refBin">🧾 Últimos 6 dígitos del recibo (ID de orden Binance)</label>
+          <div class="ref-example">
+            Ejemplo: si tu recibo termina en <span class="dim">...84</span><span class="hl">920157</span> → escribe <span class="hl">920157</span>
+          </div>
           <input
             type="text"
             maxlength="6"
             id="refBin"
             class="ref-input"
-            placeholder="000000"
+            placeholder="Ej: 920157"
             oninput="validarReferenciaEnVivo('bin')"
           />
-          <span class="ref-msg" id="refMsgBin">Ingresa los últimos 6 dígitos/caracteres del comprobante de Binance.</span>
+          <span class="ref-msg" id="refMsgBin">Aparece en el recibo de Binance como ID de orden (Order ID).</span>
         </div>
 
         <button type="button" class="btn btn-whatsapp-locked" id="waBinance" onclick="intentarConfirmarPago('bin')">
-          🔒 Escribe los 6 dígitos de referencia para continuar
+          🔒 Escribe los últimos 6 dígitos del recibo
         </button>
 
         <div id="inviteBannerBin" class="invite-banner hidden">
@@ -587,24 +620,27 @@
         </div>
 
         <div class="warning-box">
-          ⚠️ PASO FINAL OBLIGATORIO: Realiza tu pago por PayPal y escribe abajo los <strong>últimos 6 dígitos/caracteres del ID de transacción</strong>.
+          ⚠️ PASO FINAL: Realiza tu pago por PayPal y escribe abajo los <strong>últimos 6 caracteres del ID de transacción</strong> para confirmar.
         </div>
 
         <div class="ref-box" id="refBoxPay">
-          <label for="refPay">🔢 Últimos 6 dígitos del ID de transacción PayPal</label>
+          <label for="refPay">🧾 Últimos 6 caracteres del recibo (ID de transacción)</label>
+          <div class="ref-example">
+            Ejemplo: si el ID termina en <span class="dim">...7H</span><span class="hl">49K21A</span> → escribe <span class="hl">49K21A</span>
+          </div>
           <input
             type="text"
             maxlength="6"
             id="refPay"
             class="ref-input"
-            placeholder="000000"
+            placeholder="Ej: 49K21A"
             oninput="validarReferenciaEnVivo('pay')"
           />
-          <span class="ref-msg" id="refMsgPay">Ingresa los últimos 6 caracteres del comprobante de PayPal.</span>
+          <span class="ref-msg" id="refMsgPay">Aparece en el comprobante de PayPal como ID de transacción.</span>
         </div>
 
         <button type="button" class="btn btn-whatsapp-locked" id="waPaypal" onclick="intentarConfirmarPago('pay')">
-          🔒 Escribe los 6 dígitos de referencia para continuar
+          🔒 Escribe los últimos 6 caracteres del recibo
         </button>
 
         <div id="inviteBannerPay" class="invite-banner hidden">
@@ -806,26 +842,26 @@
       }
     }
 
-    // ================= VALIDACIÓN DE REFERENCIA (6 ÚLTIMOS DÍGITOS) =================
+    // ================= VALIDACIÓN DE REFERENCIA (6 ÚLTIMOS NÚMEROS DEL RECIBO) =================
 
     function validarCodigoReferencia(valor, soloNumeros) {
       var limpio = String(valor || '').trim().toUpperCase();
       if (soloNumeros) {
         if (!/^\d{6}$/.test(limpio)) {
-          return { ok: false, error: 'Debes escribir exactamente los últimos 6 números de tu referencia.' };
+          return { ok: false, error: 'Escribe exactamente los últimos 6 números del recibo de pago.' };
         }
       } else {
         if (!/^[A-Z0-9]{6}$/.test(limpio)) {
-          return { ok: false, error: 'Debes escribir los últimos 6 dígitos/caracteres del ID de transacción.' };
+          return { ok: false, error: 'Escribe los últimos 6 dígitos/caracteres del recibo de pago.' };
         }
       }
 
       // Bloquea códigos falsos obvios (000000, 111111, 123456, 654321, etc.)
       if (/^(.)\1{5}$/.test(limpio)) {
-        return { ok: false, error: '⚠️ Ese número no es válido. Ingresa los últimos 6 dígitos reales de tu comprobante.' };
+        return { ok: false, error: '⚠️ Ese número no es válido. Mira tu recibo y copia los últimos 6 números reales.' };
       }
       if (['123456', '654321', '012345', '543210'].indexOf(limpio) !== -1) {
-        return { ok: false, error: '⚠️ Ingresa los últimos 6 dígitos reales de tu comprobante, no una secuencia.' };
+        return { ok: false, error: '⚠️ Copia los últimos 6 números reales que aparecen en tu recibo bancario.' };
       }
 
       return { ok: true, ref: limpio };
@@ -851,21 +887,21 @@
         boxEl.classList.remove('valid', 'invalid');
         msgEl.className = 'ref-msg';
         msgEl.textContent = ui.soloNumeros
-          ? 'Ingresa los últimos 6 números exactos de tu comprobante bancario.'
-          : 'Ingresa los últimos 6 dígitos/caracteres de tu comprobante.';
+          ? 'Búscalo en el capture de tu banco como Referencia, Operación o Comprobante.'
+          : 'Aparece en el recibo del pago como ID de orden o ID de transacción.';
         btnEl.classList.remove('btn-whatsapp');
         btnEl.classList.add('btn-whatsapp-locked');
-        btnEl.textContent = '🔒 Escribe los 6 dígitos de referencia para continuar';
+        btnEl.textContent = '🔒 Escribe los últimos 6 números del recibo';
         return false;
       }
 
       if (val.length < 6) {
         boxEl.classList.remove('valid', 'invalid');
         msgEl.className = 'ref-msg';
-        msgEl.textContent = 'Faltan ' + (6 - val.length) + ' dígitos...';
+        msgEl.textContent = 'Faltan ' + (6 - val.length) + ' números del recibo...';
         btnEl.classList.remove('btn-whatsapp');
         btnEl.classList.add('btn-whatsapp-locked');
-        btnEl.textContent = '🔒 Escribe los 6 dígitos de referencia para continuar';
+        btnEl.textContent = '🔒 Escribe los últimos 6 números del recibo';
         return false;
       }
 
@@ -877,14 +913,14 @@
         msgEl.textContent = check.error;
         btnEl.classList.remove('btn-whatsapp');
         btnEl.classList.add('btn-whatsapp-locked');
-        btnEl.textContent = '🔒 Referencia no válida';
+        btnEl.textContent = '🔒 Número de recibo no válido';
         return false;
       }
 
       boxEl.classList.remove('invalid');
       boxEl.classList.add('valid');
       msgEl.className = 'ref-msg ok';
-      msgEl.textContent = '✅ Referencia #' + check.ref + ' lista para enviar.';
+      msgEl.textContent = '✅ Recibo #' + check.ref + ' listo para confirmar.';
       btnEl.classList.remove('btn-whatsapp-locked');
       btnEl.classList.add('btn-whatsapp');
       btnEl.textContent = ui.textoActivo;

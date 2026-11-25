@@ -259,6 +259,16 @@
       border-radius: 4px;
       letter-spacing: 1px;
     }
+    .ref-img {
+      width: 100%;
+      max-height: 190px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #334155;
+      background: #090e1a;
+      display: block;
+    }
     .ref-input {
       text-align: center;
       font-size: 20px;
@@ -397,25 +407,26 @@
 
     <div id="formSection">
       <div class="field">
-        <label for="nombre">Nombre y Apellido</label>
-        <input type="text" id="nombre" placeholder="Ej: María Pérez" autocomplete="name" />
+        <label for="nombre">Nombre y Apellido *</label>
+        <input type="text" id="nombre" placeholder="Ej: María Pérez" autocomplete="name" required />
       </div>
 
       <div class="field">
-        <label for="whatsapp">Número de WhatsApp (con + y código de país)</label>
+        <label for="whatsapp">Número de WhatsApp (con + y código de país) *</label>
         <input
           type="tel"
           id="whatsapp"
           placeholder="Ej: +584143115685 o +34612345678"
           autocomplete="tel"
+          required
           oninput="validarWhatsappEnVivo()"
         />
         <span class="wa-hint" id="waHint">Obligatorio: escribe el <strong>+</strong> y el código de tu país todo pegado, sin espacios ni guiones (Ej: <strong>+584143115685</strong>). No escribas 0414 ni 414 solo.</span>
       </div>
 
       <div class="field">
-        <label for="correo">Correo exacto que usarás en Canva</label>
-        <input type="email" id="correo" placeholder="Ej: tucorreo@gmail.com" autocomplete="email" onfocus="precalentarServidor(false)" />
+        <label for="correo">Correo exacto que usarás en Canva *</label>
+        <input type="email" id="correo" placeholder="Ej: tucorreo@gmail.com" autocomplete="email" required onfocus="precalentarServidor(false)" />
         <span class="hint">📩 Escríbelo bien: a este correo te llegará la invitación de Canva Pro.</span>
       </div>
 
@@ -449,12 +460,12 @@
 
       <div id="errorMsg" class="error-msg hidden"></div>
 
-      <!-- PASO 1: GUARDAR DATOS AL INSTANTE -->
+      <!-- PASO 1: GUARDAR DATOS AL INSTANTE (ÚNICA FORMA DE DESBLOQUEAR MÉTODOS DE PAGO) -->
       <button type="button" class="btn btn-primary" id="btnGuardar" onclick="guardarDatosCliente()">
-        💾 Guardar datos y pedir invitación
+        💾 Guardar datos y ver métodos de pago
       </button>
 
-      <!-- PASO 2: ELEGIR MÉTODO DE PAGO -->
+      <!-- PASO 2: ELEGIR MÉTODO DE PAGO (OCULTO HASTA COMPLETAR NOMBRE, WHATSAPP Y CORREO) -->
       <div id="savedSection" class="saved-box hidden">
         <h3>✅ ¡Datos guardados con éxito!</h3>
         <p id="savedText">Ya recibimos tu correo para enviarte la invitación de Canva Pro. Elige cómo deseas pagar:</p>
@@ -485,23 +496,23 @@
         <a href="#" target="_blank" class="fix-link" id="waCorregir">¿Te equivocaste en algún dato? Avísanos por WhatsApp</a>
       </div>
 
-      <!-- TARJETA 1: PAGO MÓVIL -->
+      <!-- TARJETA 1: PAGO MÓVIL (DATOS SE CARGAN SOLO AL REGISTRARSE) -->
       <div id="cardPagoMovil" class="pay-card hidden">
         <div class="pay-title">📲 Datos de Pago Móvil (Bs)</div>
 
         <div class="copy-row">
-          <div><small>Banco</small><strong>BANESCO (0134)</strong></div>
-          <button type="button" class="copy-btn" onclick="copiarTexto('0134', this)">Copiar</button>
+          <div><small>Banco</small><strong id="pmBanco">--</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarCampoPago('pmBancoCode', this)">Copiar</button>
         </div>
 
         <div class="copy-row">
-          <div><small>Cédula</small><strong>18-440-290</strong></div>
-          <button type="button" class="copy-btn" onclick="copiarTexto('18440290', this)">Copiar</button>
+          <div><small>Cédula</small><strong id="pmCedula">--</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarCampoPago('pmCedulaRaw', this)">Copiar</button>
         </div>
 
         <div class="copy-row">
-          <div><small>Teléfono</small><strong>0414-311-5685</strong></div>
-          <button type="button" class="copy-btn" onclick="copiarTexto('04143115685', this)">Copiar</button>
+          <div><small>Teléfono</small><strong id="pmTelefono">--</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarCampoPago('pmTelRaw', this)">Copiar</button>
         </div>
 
         <div class="copy-row">
@@ -514,15 +525,20 @@
         <div class="ref-box" id="refBoxPM">
           <label for="refPM">🧾 Últimos 6 números del recibo de pago (Referencia / Operación)</label>
           <div class="ref-example">
-            Ejemplo: si tu recibo dice Ref: <span class="dim">0048</span><span class="hl">291054</span> → escribe solo <span class="hl">291054</span>
+            Ejemplo: si la referencia dice <span class="dim">063286</span><span class="hl">800456</span> → escribe solo <span class="hl">800456</span>
           </div>
+          <img
+            src="referencia.jfif"
+            alt="Ejemplo de dónde ver los últimos 6 números de referencia"
+            class="ref-img"
+          />
           <input
             type="tel"
             inputmode="numeric"
             maxlength="6"
             id="refPM"
             class="ref-input"
-            placeholder="Ej: 291054"
+            placeholder="Ej: 800456"
             oninput="validarReferenciaEnVivo('pm')"
           />
           <span class="ref-msg" id="refMsgPM">Realiza tu Pago Móvil y coloca aquí los últimos 6 números de tu comprobante.</span>
@@ -537,7 +553,7 @@
         </div>
       </div>
 
-      <!-- TARJETA 2: BINANCE -->
+      <!-- TARJETA 2: BINANCE (DATOS SE CARGAN SOLO AL REGISTRARSE) -->
       <div id="cardBinance" class="pay-card binance-card hidden">
         <div class="pay-title">
           <svg viewBox="0 0 126.61 126.61" fill="currentColor">
@@ -551,12 +567,12 @@
         </div>
 
         <div class="copy-row">
-          <div><small>Correo de Binance</small><strong>alexander1x33@gmail.com</strong></div>
-          <button type="button" class="copy-btn" onclick="copiarTexto('alexander1x33@gmail.com', this)">Copiar</button>
+          <div><small>Correo de Binance</small><strong id="binCorreo">--</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarCampoPago('correoPagos', this)">Copiar</button>
         </div>
 
         <div class="copy-row">
-          <div><small>Monto exacto</small><strong id="binanceMonto">$1 USDT</strong></div>
+          <div><small>Monto exacto</small><strong id="binanceMonto">--</strong></div>
           <button type="button" class="copy-btn" onclick="copiarMontoUsd(this)">Copiar</button>
         </div>
 
@@ -585,7 +601,7 @@
         </div>
       </div>
 
-      <!-- TARJETA 3: PAYPAL -->
+      <!-- TARJETA 3: PAYPAL (DATOS SE CARGAN SOLO AL REGISTRARSE) -->
       <div id="cardPaypal" class="pay-card paypal-card hidden">
         <div class="pay-title">
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -595,12 +611,12 @@
         </div>
 
         <div class="copy-row">
-          <div><small>Correo de PayPal</small><strong>alexander1x33@gmail.com</strong></div>
-          <button type="button" class="copy-btn" onclick="copiarTexto('alexander1x33@gmail.com', this)">Copiar</button>
+          <div><small>Correo de PayPal</small><strong id="payCorreo">--</strong></div>
+          <button type="button" class="copy-btn" onclick="copiarCampoPago('correoPagos', this)">Copiar</button>
         </div>
 
         <div class="copy-row">
-          <div><small>Monto exacto</small><strong id="paypalMonto">$1 USD</strong></div>
+          <div><small>Monto exacto</small><strong id="paypalMonto">--</strong></div>
           <button type="button" class="copy-btn" onclick="copiarMontoUsd(this)">Copiar</button>
         </div>
 
@@ -661,7 +677,16 @@
   <script>
     var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLu7e_Bo8P8Dnq0aSwiSDJe43mdxdQfSYQ5QXpNZ6KQb5voGG6lggB0v836Kq41VEk/exec';
     var TU_WHATSAPP = '584163080821';
-    var CORREO_PAGOS = 'alexander1x33@gmail.com';
+    var DATOS_PAGO = {
+      pmBancoTexto: 'BANESCO (0134)',
+      pmBancoCode: '0134',
+      pmCedulaTexto: '18-440-290',
+      pmCedulaRaw: '18440290',
+      pmTelTexto: '0414-311-5685',
+      pmTelRaw: '04143115685',
+      correoPagos: 'alexander1x33@gmail.com'
+    };
+
     var STORAGE_KEY = 'canva_reg_bloqueo_v1';
     var SESSION_KEY = 'canva_reg_sesion_v1';
     var COOLDOWN_KEY = 'canva_reg_cooldown_v1';
@@ -763,6 +788,30 @@
         });
     }
 
+    function datosClienteCompletos() {
+      return Boolean(
+        yaGuardado &&
+        datosCliente &&
+        String(datosCliente.nombre || '').trim().length >= 2 &&
+        validarFormatoWhatsapp(datosCliente.whatsapp) &&
+        validarFormatoCorreo(datosCliente.correo)
+      );
+    }
+
+    function desbloquearDatosPago() {
+      if (!datosClienteCompletos()) return;
+      document.getElementById('pmBanco').textContent = DATOS_PAGO.pmBancoTexto;
+      document.getElementById('pmCedula').textContent = DATOS_PAGO.pmCedulaTexto;
+      document.getElementById('pmTelefono').textContent = DATOS_PAGO.pmTelTexto;
+      document.getElementById('pmMonto').textContent = calcularBsTexto(planActual.usd);
+
+      document.getElementById('binCorreo').textContent = DATOS_PAGO.correoPagos;
+      document.getElementById('binanceMonto').textContent = '$' + planActual.usd + ' USDT';
+
+      document.getElementById('payCorreo').textContent = DATOS_PAGO.correoPagos;
+      document.getElementById('paypalMonto').textContent = '$' + planActual.usd + ' USD';
+    }
+
     function actualizarResumen() {
       var hoy = new Date();
       var fin = new Date(hoy.getTime());
@@ -777,11 +826,8 @@
       document.getElementById('sumUsd').textContent = '$' + planActual.usd + ' USD';
       document.getElementById('sumBs').textContent = calcularBsTexto(planActual.usd);
 
-      document.getElementById('pmMonto').textContent = calcularBsTexto(planActual.usd);
-      document.getElementById('binanceMonto').textContent = '$' + planActual.usd + ' USDT';
-      document.getElementById('paypalMonto').textContent = '$' + planActual.usd + ' USD';
-
-      if (yaGuardado) {
+      if (datosClienteCompletos()) {
+        desbloquearDatosPago();
         document.getElementById('savedText').textContent =
           'Ya recibimos tu correo (' + datosCliente.correo + ') para tu plan de ' + planActual.plan + ' ($' + planActual.usd + ' / ' + calcularBsTexto(planActual.usd) + '). Elige tu método de pago:';
         var msgFix = 'Hola, soy ' + datosCliente.nombre + '. Me equivoqué en un dato al registrarme (correo puesto: ' + datosCliente.correo + '). ¿Me ayudas a corregirlo?';
@@ -789,11 +835,16 @@
       }
     }
 
-    // ================= VALIDACIÓN OBLIGATORIA DE WHATSAPP INTERNACIONAL =================
+    // ================= VALIDACIÓN OBLIGATORIA DE WHATSAPP Y CORREO =================
 
     function validarFormatoWhatsapp(valor) {
       var limpio = String(valor || '').trim();
       return /^\+[1-9]\d{7,14}$/.test(limpio);
+    }
+
+    function validarFormatoCorreo(valor) {
+      var limpio = String(valor || '').trim();
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(limpio);
     }
 
     function validarWhatsappEnVivo() {
@@ -914,15 +965,20 @@
       if (tipo === 'pm') {
         msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el Pago Móvil de ' + montoBs + ' ($' + planActual.usd + ' a tasa BCV) por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
       } else if (tipo === 'bin') {
-        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por Binance de $' + planActual.usd + ' USDT al correo ' + CORREO_PAGOS + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
+        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por Binance de $' + planActual.usd + ' USDT al correo ' + DATOS_PAGO.correoPagos + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
       } else {
-        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por PayPal de $' + planActual.usd + ' USD al correo ' + CORREO_PAGOS + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
+        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por PayPal de $' + planActual.usd + ' USD al correo ' + DATOS_PAGO.correoPagos + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
       }
 
       return 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msg);
     }
 
     function intentarConfirmarPago(tipo) {
+      if (!datosClienteCompletos()) {
+        mostrarError('Primero completa tu nombre, WhatsApp y correo obligatorio.');
+        return;
+      }
+
       var ui = REF_UI[tipo];
       if (!ui) return;
 
@@ -985,7 +1041,7 @@
     }
 
     function bloquearFormularioUI() {
-      yaGuardado = true;
+      if (!datosClienteCompletos()) return;
       detenerRelojPorRegistro();
 
       document.getElementById('nombre').value = datosCliente.nombre;
@@ -1015,9 +1071,18 @@
         if (!raw) return;
         var reg = JSON.parse(raw);
         var ahora = Date.now();
-        if (reg && reg.expira && ahora < reg.expira) {
-          datosCliente = reg.datosCliente || datosCliente;
+        if (
+          reg &&
+          reg.expira &&
+          ahora < reg.expira &&
+          reg.datosCliente &&
+          String(reg.datosCliente.nombre || '').trim().length >= 2 &&
+          validarFormatoWhatsapp(reg.datosCliente.whatsapp) &&
+          validarFormatoCorreo(reg.datosCliente.correo)
+        ) {
+          datosCliente = reg.datosCliente;
           planActual = reg.planActual || planActual;
+          yaGuardado = true;
           bloquearFormularioUI();
         } else {
           localStorage.removeItem(STORAGE_KEY);
@@ -1166,26 +1231,28 @@
       var whatsapp = document.getElementById('whatsapp').value.trim();
       var correo = document.getElementById('correo').value.trim();
 
-      if (!nombre || !whatsapp || !correo) {
-        mostrarError('Por favor completa tu nombre, WhatsApp y correo de Canva.');
+      if (!nombre || nombre.length < 2) {
+        mostrarError('Por favor escribe tu nombre y apellido obligatorio.');
+        document.getElementById('nombre').focus();
         return;
       }
 
-      if (!validarFormatoWhatsapp(whatsapp)) {
+      if (!whatsapp || !validarFormatoWhatsapp(whatsapp)) {
         validarWhatsappEnVivo();
-        mostrarError('WhatsApp inválido: escribe el + y el código de tu país todo pegado (Ej: +584143115685).');
+        mostrarError('WhatsApp obligatorio: escribe el + y el código de tu país todo pegado (Ej: +584143115685).');
         document.getElementById('whatsapp').focus();
         return;
       }
 
-      if (correo.indexOf('@') === -1 || correo.indexOf('.') === -1) {
-        mostrarError('Ingresa un correo electrónico válido.');
+      if (!correo || !validarFormatoCorreo(correo)) {
+        mostrarError('Correo obligatorio: ingresa un correo electrónico válido para tu invitación de Canva.');
         document.getElementById('correo').focus();
         return;
       }
       ocultarError();
 
       datosCliente = { nombre: nombre, whatsapp: whatsapp, correo: correo };
+      yaGuardado = true;
 
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -1216,6 +1283,12 @@
     }
 
     function mostrarMetodo(tipo) {
+      if (!datosClienteCompletos()) {
+        mostrarError('Completa primero tu nombre, WhatsApp y correo para ver los datos de pago.');
+        return;
+      }
+
+      desbloquearDatosPago();
       document.getElementById('cardPagoMovil').classList.add('hidden');
       document.getElementById('cardBinance').classList.add('hidden');
       document.getElementById('cardPaypal').classList.add('hidden');
@@ -1224,6 +1297,12 @@
       var card = document.getElementById(targetId);
       card.classList.remove('hidden');
       card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copiarCampoPago(clave, btn) {
+      if (!datosClienteCompletos()) return;
+      var valor = DATOS_PAGO[clave] || '';
+      if (valor) copiarTexto(valor, btn);
     }
 
     function copiarTexto(texto, btn) {
@@ -1244,16 +1323,19 @@
     }
 
     function copiarMontoBs(btn) {
+      if (!datosClienteCompletos()) return;
       var val = calcularBsNumero(planActual.usd) || 'Consultar';
       copiarTexto(val, btn);
     }
 
     function copiarMontoUsd(btn) {
+      if (!datosClienteCompletos()) return;
       copiarTexto(String(planActual.usd), btn);
     }
 
     function copiarTodoPM(btn) {
-      var texto = 'Pago Móvil\nBanco: BANESCO (0134)\nCédula: 18440290\nTeléfono: 04143115685\nMonto: ' + calcularBsTexto(planActual.usd);
+      if (!datosClienteCompletos()) return;
+      var texto = 'Pago Móvil\nBanco: ' + DATOS_PAGO.pmBancoTexto + '\nCédula: ' + DATOS_PAGO.pmCedulaRaw + '\nTeléfono: ' + DATOS_PAGO.pmTelRaw + '\nMonto: ' + calcularBsTexto(planActual.usd);
       copiarTexto(texto, btn);
     }
 

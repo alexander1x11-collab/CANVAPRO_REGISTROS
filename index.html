@@ -24,7 +24,6 @@
       --danger: #ef4444;
       --binance: #f3ba2f;
       --paypal: #0070ba;
-      --warn-bg: rgba(239, 68, 68, 0.14);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body {
@@ -113,7 +112,7 @@
     }
     .field { margin-bottom: 14px; }
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #e2e8f0; }
-    .hint { font-size: 11.5px; color: #fbbf24; margin-top: 4px; display: block; line-height: 1.35; }
+    .hint { font-size: 11.5px; color: #cbd5e1; margin-top: 4px; display: block; line-height: 1.35; }
     .wa-hint { font-size: 11.5px; color: #94a3b8; margin-top: 5px; display: block; line-height: 1.35; }
     input {
       width: 100%; padding: 12px 14px; border-radius: 10px;
@@ -217,15 +216,9 @@
       border: 1px solid var(--primary); border-radius: 10px; padding: 10px;
       font-size: 13px; font-weight: 700; cursor: pointer; margin: 4px 0 12px;
     }
-    .warning-box {
-      background: var(--warn-bg); border: 1.5px solid var(--danger);
-      color: #fecaca; border-radius: 12px; padding: 11px;
-      font-size: 12.5px; font-weight: 700; text-align: center;
-      margin-bottom: 12px; line-height: 1.4;
-    }
     .ref-box {
       background: rgba(15, 23, 42, 0.85);
-      border: 1.5px solid #475569;
+      border: 1.5px solid rgba(0, 196, 204, 0.45);
       border-radius: 12px;
       padding: 12px;
       margin-bottom: 10px;
@@ -423,7 +416,7 @@
       <div class="field">
         <label for="correo">Correo exacto que usarás en Canva</label>
         <input type="email" id="correo" placeholder="Ej: tucorreo@gmail.com" autocomplete="email" onfocus="precalentarServidor(false)" />
-        <span class="hint">⚠️ Escríbelo bien: a este correo te llegará la invitación de Canva Pro.</span>
+        <span class="hint">📩 Escríbelo bien: a este correo te llegará la invitación de Canva Pro.</span>
       </div>
 
       <div class="field">
@@ -518,12 +511,8 @@
 
         <button type="button" class="copy-all-btn" onclick="copiarTodoPM(this)">📋 Copiar todos los datos</button>
 
-        <div class="warning-box">
-          ⚠️ PASO FINAL: Realiza tu Pago Móvil y escribe abajo los <strong>últimos 6 números del recibo de pago</strong> para confirmar.
-        </div>
-
         <div class="ref-box" id="refBoxPM">
-          <label for="refPM">🧾 Últimos 6 números del recibo (Referencia / Operación)</label>
+          <label for="refPM">🧾 Últimos 6 números del recibo de pago (Referencia / Operación)</label>
           <div class="ref-example">
             Ejemplo: si tu recibo dice Ref: <span class="dim">0048</span><span class="hl">291054</span> → escribe solo <span class="hl">291054</span>
           </div>
@@ -536,7 +525,7 @@
             placeholder="Ej: 291054"
             oninput="validarReferenciaEnVivo('pm')"
           />
-          <span class="ref-msg" id="refMsgPM">Búscalo en el capture de tu banco como Referencia, Operación o Comprobante.</span>
+          <span class="ref-msg" id="refMsgPM">Realiza tu Pago Móvil y coloca aquí los últimos 6 números de tu comprobante.</span>
         </div>
 
         <button type="button" class="btn btn-whatsapp-locked" id="waPagoMovil" onclick="intentarConfirmarPago('pm')">
@@ -571,10 +560,6 @@
           <button type="button" class="copy-btn" onclick="copiarMontoUsd(this)">Copiar</button>
         </div>
 
-        <div class="warning-box">
-          ⚠️ PASO FINAL: Envía tu pago por Binance Pay y escribe abajo los <strong>últimos 6 dígitos del ID de orden</strong> para confirmar.
-        </div>
-
         <div class="ref-box" id="refBoxBin">
           <label for="refBin">🧾 Últimos 6 dígitos del recibo (ID de orden Binance)</label>
           <div class="ref-example">
@@ -588,7 +573,7 @@
             placeholder="Ej: 920157"
             oninput="validarReferenciaEnVivo('bin')"
           />
-          <span class="ref-msg" id="refMsgBin">Aparece en el recibo de Binance como ID de orden (Order ID).</span>
+          <span class="ref-msg" id="refMsgBin">Realiza tu pago por Binance y coloca aquí los últimos 6 dígitos de tu orden.</span>
         </div>
 
         <button type="button" class="btn btn-whatsapp-locked" id="waBinance" onclick="intentarConfirmarPago('bin')">
@@ -619,10 +604,6 @@
           <button type="button" class="copy-btn" onclick="copiarMontoUsd(this)">Copiar</button>
         </div>
 
-        <div class="warning-box">
-          ⚠️ PASO FINAL: Realiza tu pago por PayPal y escribe abajo los <strong>últimos 6 caracteres del ID de transacción</strong> para confirmar.
-        </div>
-
         <div class="ref-box" id="refBoxPay">
           <label for="refPay">🧾 Últimos 6 caracteres del recibo (ID de transacción)</label>
           <div class="ref-example">
@@ -636,7 +617,7 @@
             placeholder="Ej: 49K21A"
             oninput="validarReferenciaEnVivo('pay')"
           />
-          <span class="ref-msg" id="refMsgPay">Aparece en el comprobante de PayPal como ID de transacción.</span>
+          <span class="ref-msg" id="refMsgPay">Realiza tu pago por PayPal y coloca aquí los últimos 6 caracteres del ID.</span>
         </div>
 
         <button type="button" class="btn btn-whatsapp-locked" id="waPaypal" onclick="intentarConfirmarPago('pay')">
@@ -831,9 +812,9 @@
         input.style.borderColor = 'var(--danger)';
         hint.style.color = '#fca5a5';
         if (val.charAt(0) !== '+') {
-          hint.innerHTML = '⚠️ <strong>Falta el + y el código de país.</strong> No pongas 0414 ni 414 solo. Ejemplo: <strong>+584143115685</strong> (Venezuela) o <strong>+34612345678</strong> (fuera del país).';
+          hint.innerHTML = 'Falta el <strong>+</strong> y el código de país. No pongas 0414 ni 414 solo. Ejemplo: <strong>+584143115685</strong> (Venezuela) o <strong>+34612345678</strong> (fuera del país).';
         } else {
-          hint.innerHTML = '⚠️ <strong>Formato inválido.</strong> Escribe el <strong>+</strong> y todos los números pegados sin espacios ni guiones (Ej: <strong>+584143115685</strong>).';
+          hint.innerHTML = 'Formato inválido. Escribe el <strong>+</strong> y todos los números pegados sin espacios ni guiones (Ej: <strong>+584143115685</strong>).';
         }
       } else {
         input.style.borderColor = 'var(--success)';
@@ -856,12 +837,11 @@
         }
       }
 
-      // Bloquea códigos falsos obvios (000000, 111111, 123456, 654321, etc.)
       if (/^(.)\1{5}$/.test(limpio)) {
-        return { ok: false, error: '⚠️ Ese número no es válido. Mira tu recibo y copia los últimos 6 números reales.' };
+        return { ok: false, error: 'Ese número no es válido. Mira tu recibo y copia los últimos 6 números reales.' };
       }
       if (['123456', '654321', '012345', '543210'].indexOf(limpio) !== -1) {
-        return { ok: false, error: '⚠️ Copia los últimos 6 números reales que aparecen en tu recibo bancario.' };
+        return { ok: false, error: 'Copia los últimos 6 números reales que aparecen en tu recibo bancario.' };
       }
 
       return { ok: true, ref: limpio };
@@ -887,7 +867,7 @@
         boxEl.classList.remove('valid', 'invalid');
         msgEl.className = 'ref-msg';
         msgEl.textContent = ui.soloNumeros
-          ? 'Búscalo en el capture de tu banco como Referencia, Operación o Comprobante.'
+          ? 'Realiza tu Pago Móvil y coloca aquí los últimos 6 números de tu comprobante.'
           : 'Aparece en el recibo del pago como ID de orden o ID de transacción.';
         btnEl.classList.remove('btn-whatsapp');
         btnEl.classList.add('btn-whatsapp-locked');
@@ -962,12 +942,10 @@
 
       var enlaceWA = construirEnlaceWhatsAppConRef(tipo, check.ref);
 
-      // Muestra el aviso fijo en la tarjeta de pago
       var bannerEl = document.getElementById(ui.banner);
       bannerEl.innerHTML = '✅ <strong>A tu correo (' + datosCliente.correo + ') fue enviada la invitación a Canva.</strong> Revisa tu correo (y carpeta de Spam) y acepta unirte a Canva.';
       bannerEl.classList.remove('hidden');
 
-      // Abre la ventana de confirmación antes de saltar a WhatsApp
       document.getElementById('modalTitle').textContent = '¡Pago reportado (Ref: #' + check.ref + ')!';
       document.getElementById('modalInviteText').innerHTML =
         '✅ <strong>A tu correo (' + datosCliente.correo + ') fue enviada la invitación a Canva</strong>, revisa tu correo (y carpeta de Spam) y acepta unirte a Canva.';
@@ -1153,6 +1131,7 @@
         method: 'POST',
         redirect: 'follow',
         cache: 'no-store',
+        keepalive: true,
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: payloadStr
       })
@@ -1162,7 +1141,7 @@
       })
       .catch(function(err) {
         console.log('Reintento envío (' + intento + '):', err);
-        if (intento < 2) {
+        if (intento < 3) {
           setTimeout(function() {
             enviarRegistroConReintento(payloadStr, intento + 1);
           }, 1500);
@@ -1194,7 +1173,7 @@
 
       if (!validarFormatoWhatsapp(whatsapp)) {
         validarWhatsappEnVivo();
-        mostrarError('⚠️ WhatsApp inválido: escribe el + y el código de tu país todo pegado (Ej: +584143115685).');
+        mostrarError('WhatsApp inválido: escribe el + y el código de tu país todo pegado (Ej: +584143115685).');
         document.getElementById('whatsapp').focus();
         return;
       }

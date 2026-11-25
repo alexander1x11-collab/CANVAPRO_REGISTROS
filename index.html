@@ -421,7 +421,7 @@
           required
           oninput="validarWhatsappEnVivo()"
         />
-        <span class="wa-hint" id="waHint">Obligatorio: escribe el <strong>+</strong> y el código de tu país todo pegado, sin espacios ni guiones (Ej: <strong>+584143115685</strong>). No escribas 0414 ni 414 solo.</span>
+        <span class="wa-hint" id="waHint">Obligatorio: escribe el <strong>+</strong> y el código de tu país pegado, <strong>sin el 0</strong> en Venezuela (Ej: <strong>+584143115685</strong> o <strong>+58412...</strong>).</span>
       </div>
 
       <div class="field">
@@ -839,7 +839,14 @@
 
     function validarFormatoWhatsapp(valor) {
       var limpio = String(valor || '').trim();
-      return /^\+[1-9]\d{7,14}$/.test(limpio);
+      if (!/^\+[1-9]\d{7,14}$/.test(limpio)) return false;
+
+      // En Venezuela (+58) nunca empieza por 0 después del +58 y tiene exactamente 10 dígitos locales
+      if (limpio.indexOf('+58') === 0) {
+        if (limpio.charAt(3) === '0') return false;
+        return /^\+58[1-9]\d{9}$/.test(limpio);
+      }
+      return true;
     }
 
     function validarFormatoCorreo(valor) {
@@ -855,7 +862,14 @@
       if (!val) {
         input.style.borderColor = 'var(--border)';
         hint.style.color = '#94a3b8';
-        hint.innerHTML = 'Obligatorio: escribe el <strong>+</strong> y el código de tu país todo pegado, sin espacios ni guiones (Ej: <strong>+584143115685</strong>). No escribas 0414 ni 414 solo.';
+        hint.innerHTML = 'Obligatorio: escribe el <strong>+</strong> y el código de tu país pegado, <strong>sin el 0</strong> en Venezuela (Ej: <strong>+584143115685</strong> o <strong>+58412...</strong>).';
+        return;
+      }
+
+      if (val.indexOf('+580') === 0) {
+        input.style.borderColor = 'var(--danger)';
+        hint.style.color = '#fca5a5';
+        hint.innerHTML = '❌ <strong>Quita el 0 después del +58.</strong> En Venezuela no lleva cero. Escríbelo así: <strong>+584143115685</strong> o <strong>+58412...</strong>';
         return;
       }
 
@@ -864,6 +878,8 @@
         hint.style.color = '#fca5a5';
         if (val.charAt(0) !== '+') {
           hint.innerHTML = 'Falta el <strong>+</strong> y el código de país. No pongas 0414 ni 414 solo. Ejemplo: <strong>+584143115685</strong> (Venezuela) o <strong>+34612345678</strong> (fuera del país).';
+        } else if (val.indexOf('+58') === 0) {
+          hint.innerHTML = 'Número de Venezuela incompleto o inválido. Debe llevar <strong>+58</strong> y 10 dígitos sin el 0 (Ej: <strong>+584143115685</strong>).';
         } else {
           hint.innerHTML = 'Formato inválido. Escribe el <strong>+</strong> y todos los números pegados sin espacios ni guiones (Ej: <strong>+584143115685</strong>).';
         }
@@ -1234,6 +1250,13 @@
       if (!nombre || nombre.length < 2) {
         mostrarError('Por favor escribe tu nombre y apellido obligatorio.');
         document.getElementById('nombre').focus();
+        return;
+      }
+
+      if (whatsapp.indexOf('+580') === 0) {
+        validarWhatsappEnVivo();
+        mostrarError('En Venezuela no pongas el 0 después del +58. Ejemplo correcto: +584143115685.');
+        document.getElementById('whatsapp').focus();
         return;
       }
 

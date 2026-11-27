@@ -650,7 +650,7 @@
     <div id="expiredSection" class="status-screen hidden">
       <div class="status-icon">🔒</div>
       <h2>Tiempo de registro agotado</h2>
-      <p>Pasaron los 15 minutos sin completar el registro. Por seguridad, debes esperar <strong>1 hora</strong> para volver a intentarlo o escribirnos directo al WhatsApp.</p>
+      <p>Pasaron los 20 minutos sin completar el registro. Por seguridad, debes esperar <strong>1 hora</strong> para volver a intentarlo o escribirnos directo al WhatsApp.</p>
       <div class="cooldown-badge" id="cooldownTimer">⏳ Espera: 60:00</div>
       <a href="#" target="_blank" class="btn btn-whatsapp" id="waExpirado">
         💬 Escribir directo al WhatsApp
@@ -691,7 +691,7 @@
     var SESSION_KEY = 'canva_reg_sesion_v1';
     var COOLDOWN_KEY = 'canva_reg_cooldown_v1';
     var HORAS_BLOQUEO = 24;
-    var MINUTOS_SESION = 15;
+    var MINUTOS_SESION = 20;
     var MINUTOS_COOLDOWN = 60;
 
     var params = new URLSearchParams(window.location.search);

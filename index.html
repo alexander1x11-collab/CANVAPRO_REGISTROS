@@ -120,7 +120,7 @@
       color: var(--text); font-size: 15px; outline: none;
     }
     input:focus { border-color: var(--primary); }
-    input:disabled { opacity: 0.6; cursor: not-allowed; }
+    input:disabled { opacity: 0.65; cursor: not-allowed; }
     .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px; }
     .plan-btn {
       background: var(--card-2); border: 2px solid var(--border);
@@ -169,23 +169,16 @@
     }
     .btn:disabled { opacity: 0.55; cursor: not-allowed; }
     .hidden { display: none !important; }
-    .saved-box {
+    .methods-box {
       margin-top: 14px;
-      background: rgba(34, 197, 94, 0.14);
-      border: 1.5px solid var(--success);
+      background: rgba(0, 196, 204, 0.08);
+      border: 1.5px solid rgba(0, 196, 204, 0.4);
       border-radius: 14px;
       padding: 14px;
       text-align: center;
     }
-    .saved-box h3 { color: #86efac; font-size: 15px; margin-bottom: 6px; }
-    .saved-box p { color: #e2e8f0; font-size: 13px; line-height: 1.45; margin-bottom: 12px; }
-    .fix-link {
-      display: inline-block;
-      margin-top: 12px;
-      font-size: 12px;
-      color: #94a3b8;
-      text-decoration: underline;
-    }
+    .methods-box h3 { color: #67e8f9; font-size: 15px; margin-bottom: 6px; }
+    .methods-box p { color: #e2e8f0; font-size: 12.5px; line-height: 1.4; margin-bottom: 12px; }
     .pay-card {
       margin-top: 14px; background: var(--card-2);
       border: 1.5px solid var(--primary); border-radius: 14px; padding: 14px;
@@ -296,8 +289,40 @@
     }
     .ref-msg.ok { color: #86efac; }
     .ref-msg.err { color: #fca5a5; }
+    .datos-step {
+      margin-top: 16px;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1.5px solid var(--success);
+      border-radius: 14px;
+      padding: 15px;
+    }
+    .datos-step-header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .datos-step-header h3 {
+      color: #86efac;
+      font-size: 15.5px;
+      margin-bottom: 4px;
+    }
+    .datos-step-header p {
+      color: #cbd5e1;
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+    .ref-locked-pill {
+      display: inline-block;
+      background: rgba(34, 197, 94, 0.16);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      color: #86efac;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
     .invite-banner {
-      margin-top: 10px;
+      margin-top: 12px;
       background: rgba(34, 197, 94, 0.15);
       border: 1.5px solid var(--success);
       color: #dcfce7;
@@ -306,6 +331,14 @@
       font-size: 12.5px;
       line-height: 1.45;
       text-align: center;
+    }
+    .fix-link {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-decoration: underline;
     }
     .error-msg {
       color: #fca5a5; font-size: 13px; margin-bottom: 10px;
@@ -397,7 +430,7 @@
         <div class="logo">C</div>
         <div>
           <h1>Registro Canva Pro</h1>
-          <p>Completa tus datos para activar</p>
+          <p>Elige tu plan, paga y activa al instante</p>
         </div>
       </div>
       <div class="timer" id="timer">⏳ 20:00</div>
@@ -406,32 +439,9 @@
     <div class="bcv-bar" id="bcvBar">🏦 Cargando tasa oficial del BCV...</div>
 
     <div id="formSection">
+      <!-- PASO 1: PLAN Y MONTO -->
       <div class="field">
-        <label for="nombre">Nombre y Apellido *</label>
-        <input type="text" id="nombre" placeholder="Ej: María Pérez" autocomplete="name" required />
-      </div>
-
-      <div class="field">
-        <label for="whatsapp">Número de WhatsApp (con + y código de país) *</label>
-        <input
-          type="tel"
-          id="whatsapp"
-          placeholder="Ej: +584143115685 o +34612345678"
-          autocomplete="tel"
-          required
-          oninput="validarWhatsappEnVivo()"
-        />
-        <span class="wa-hint" id="waHint">Obligatorio: escribe el <strong>+</strong> y el código de tu país pegado, <strong>sin el 0</strong> en Venezuela (Ej: <strong>+584143115685</strong> o <strong>+58412...</strong>).</span>
-      </div>
-
-      <div class="field">
-        <label for="correo">Correo exacto que usarás en Canva *</label>
-        <input type="email" id="correo" placeholder="Ej: tucorreo@gmail.com" autocomplete="email" required onfocus="precalentarServidor(false)" />
-        <span class="hint">📩 Escríbelo bien: a este correo te llegará la invitación de Canva Pro.</span>
-      </div>
-
-      <div class="field">
-        <label>Selecciona tu plan</label>
+        <label>1. Selecciona tu plan</label>
         <div class="plans">
           <button type="button" class="plan-btn active" data-plan="1 mes" onclick="seleccionarPlan(this, '1 mes', 30, 1)">
             <span class="plan-title">1 Mes</span>
@@ -458,24 +468,22 @@
         <div><span>Monto en Bs (BCV)</span><strong id="sumBs" style="color:#00c4cc;">--</strong></div>
       </div>
 
-      <div id="errorMsg" class="error-msg hidden"></div>
-
-      <!-- PASO 1: GUARDAR DATOS AL INSTANTE (ÚNICA FORMA DE DESBLOQUEAR MÉTODOS DE PAGO) -->
-      <button type="button" class="btn btn-primary" id="btnGuardar" onclick="guardarDatosCliente()">
-        💾 Guardar datos y ver métodos de pago
+      <!-- BOTÓN PARA DESPLEGAR MÉTODOS DE PAGO -->
+      <button type="button" class="btn btn-primary" id="btnVerMetodos" onclick="abrirMetodosPago()">
+        💳 Ver métodos de pago
       </button>
 
-      <!-- PASO 2: ELEGIR MÉTODO DE PAGO (OCULTO HASTA COMPLETAR NOMBRE, WHATSAPP Y CORREO) -->
-      <div id="savedSection" class="saved-box hidden">
-        <h3>✅ ¡Datos guardados con éxito!</h3>
-        <p id="savedText">Ya recibimos tu correo para enviarte la invitación de Canva Pro. Elige cómo deseas pagar:</p>
+      <!-- SELECTOR DE MÉTODO DE PAGO -->
+      <div id="methodsSection" class="methods-box hidden">
+        <h3>💳 Elige cómo deseas pagar</h3>
+        <p id="methodsText">Realiza tu pago y coloca los últimos 6 dígitos de tu referencia para pasar a tus datos de registro.</p>
 
-        <button type="button" class="btn btn-pm" onclick="mostrarMetodo('pagomovil')">
+        <button type="button" class="btn btn-pm" id="btnMetPM" onclick="mostrarMetodo('pagomovil')">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 1H7C5.9 1 5 1.9 5 3v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14zm-5 3c-.83 0-1.5-.67-1.5-1.5S11.17 19 12 19s1.5.67 1.5 1.5S12.83 22 12 22z"/></svg>
-          Ver datos de Pago Móvil (Bs)
+          Pago Móvil (Bs)
         </button>
 
-        <button type="button" class="btn btn-binance" onclick="mostrarMetodo('binance')">
+        <button type="button" class="btn btn-binance" id="btnMetBin" onclick="mostrarMetodo('binance')">
           <svg viewBox="0 0 126.61 126.61" fill="currentColor">
             <polygon points="38.73,53.2 63.3,28.63 87.88,53.21 102.18,38.91 63.3,0 24.43,38.88"/>
             <rect x="4.19" y="53.2" width="20.22" height="20.22" transform="translate(-40.57 28.63) rotate(-45)"/>
@@ -483,20 +491,18 @@
             <rect x="102.2" y="53.2" width="20.22" height="20.22" transform="translate(-11.94 97.94) rotate(-45)"/>
             <polygon points="77.83,63.3 63.3,48.77 52.58,59.49 51.34,60.73 48.78,63.29 63.3,77.82 77.83,63.3"/>
           </svg>
-          Ver datos de Binance ($)
+          Binance Pay ($)
         </button>
 
-        <button type="button" class="btn btn-paypal" onclick="mostrarMetodo('paypal')">
+        <button type="button" class="btn btn-paypal" id="btnMetPay" onclick="mostrarMetodo('paypal')">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/>
           </svg>
-          Ver datos de PayPal ($)
+          PayPal ($)
         </button>
-
-        <a href="#" target="_blank" class="fix-link" id="waCorregir">¿Te equivocaste en algún dato? Avísanos por WhatsApp</a>
       </div>
 
-      <!-- TARJETA 1: PAGO MÓVIL (DATOS SE CARGAN SOLO AL REGISTRARSE) -->
+      <!-- TARJETA 1: PAGO MÓVIL -->
       <div id="cardPagoMovil" class="pay-card hidden">
         <div class="pay-title">📲 Datos de Pago Móvil (Bs)</div>
 
@@ -544,16 +550,12 @@
           <span class="ref-msg" id="refMsgPM">Realiza tu Pago Móvil y coloca aquí los últimos 6 números de tu comprobante.</span>
         </div>
 
-        <button type="button" class="btn btn-whatsapp-locked" id="waPagoMovil" onclick="intentarConfirmarPago('pm')">
+        <button type="button" class="btn btn-whatsapp-locked" id="btnLockPM" onclick="confirmarReferencia('pm')">
           🔒 Escribe los últimos 6 números del recibo
         </button>
-
-        <div id="inviteBannerPM" class="invite-banner hidden">
-          ✅ <strong>A tu correo fue enviada la invitación a Canva.</strong> Revisa tu correo (y carpeta de Spam) y acepta unirte a Canva.
-        </div>
       </div>
 
-      <!-- TARJETA 2: BINANCE (DATOS SE CARGAN SOLO AL REGISTRARSE) -->
+      <!-- TARJETA 2: BINANCE -->
       <div id="cardBinance" class="pay-card binance-card hidden">
         <div class="pay-title">
           <svg viewBox="0 0 126.61 126.61" fill="currentColor">
@@ -592,16 +594,12 @@
           <span class="ref-msg" id="refMsgBin">Realiza tu pago por Binance y coloca aquí los últimos 6 dígitos de tu orden.</span>
         </div>
 
-        <button type="button" class="btn btn-whatsapp-locked" id="waBinance" onclick="intentarConfirmarPago('bin')">
+        <button type="button" class="btn btn-whatsapp-locked" id="btnLockBin" onclick="confirmarReferencia('bin')">
           🔒 Escribe los últimos 6 dígitos del recibo
         </button>
-
-        <div id="inviteBannerBin" class="invite-banner hidden">
-          ✅ <strong>A tu correo fue enviada la invitación a Canva.</strong> Revisa tu correo (y carpeta de Spam) y acepta unirte a Canva.
-        </div>
       </div>
 
-      <!-- TARJETA 3: PAYPAL (DATOS SE CARGAN SOLO AL REGISTRARSE) -->
+      <!-- TARJETA 3: PAYPAL -->
       <div id="cardPaypal" class="pay-card paypal-card hidden">
         <div class="pay-title">
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -636,13 +634,54 @@
           <span class="ref-msg" id="refMsgPay">Realiza tu pago por PayPal y coloca aquí los últimos 6 caracteres del ID.</span>
         </div>
 
-        <button type="button" class="btn btn-whatsapp-locked" id="waPaypal" onclick="intentarConfirmarPago('pay')">
+        <button type="button" class="btn btn-whatsapp-locked" id="btnLockPay" onclick="confirmarReferencia('pay')">
           🔒 Escribe los últimos 6 caracteres del recibo
         </button>
+      </div>
 
-        <div id="inviteBannerPay" class="invite-banner hidden">
+      <!-- PASO 2 (OBLIGATORIO DESPUÉS DE PAGAR Y BLOQUEAR REFERENCIA): DATOS DEL CLIENTE -->
+      <div id="datosStepSection" class="datos-step hidden">
+        <div class="datos-step-header">
+          <div class="ref-locked-pill" id="refLockedPill">🔒 Pago confirmado • Ref: #------</div>
+          <h3>2. Completa tus datos para activar</h3>
+          <p>Obligatorio: llena tu nombre, WhatsApp y correo de Canva para desbloquear el envío del comprobante.</p>
+        </div>
+
+        <div class="field">
+          <label for="nombre">Nombre y Apellido *</label>
+          <input type="text" id="nombre" placeholder="Ej: María Pérez" autocomplete="name" required oninput="validarDatosEnVivo()" />
+        </div>
+
+        <div class="field">
+          <label for="whatsapp">Número de WhatsApp (con + y código de país) *</label>
+          <input
+            type="tel"
+            id="whatsapp"
+            placeholder="Ej: +584143115685 o +34612345678"
+            autocomplete="tel"
+            required
+            oninput="validarWhatsappEnVivo(); validarDatosEnVivo();"
+          />
+          <span class="wa-hint" id="waHint">Obligatorio: escribe el <strong>+</strong> y el código de tu país pegado, <strong>sin el 0</strong> en Venezuela (Ej: <strong>+584143115685</strong> o <strong>+58412...</strong>).</span>
+        </div>
+
+        <div class="field">
+          <label for="correo">Correo exacto que usarás en Canva *</label>
+          <input type="email" id="correo" placeholder="Ej: tucorreo@gmail.com" autocomplete="email" required onfocus="precalentarServidor(false)" oninput="validarDatosEnVivo()" />
+          <span class="hint">📩 Escríbelo bien: a este correo te llegará la invitación de Canva Pro.</span>
+        </div>
+
+        <div id="errorMsg" class="error-msg hidden"></div>
+
+        <button type="button" class="btn btn-whatsapp-locked" id="btnEnviarFinal" onclick="finalizarRegistroYWhatsApp()">
+          🔒 Completa tu nombre, WhatsApp y correo
+        </button>
+
+        <div id="inviteBannerFinal" class="invite-banner hidden">
           ✅ <strong>A tu correo fue enviada la invitación a Canva.</strong> Revisa tu correo (y carpeta de Spam) y acepta unirte a Canva.
         </div>
+
+        <a href="#" target="_blank" class="fix-link hidden" id="waCorregir">¿Te equivocaste en algún dato? Avísanos por WhatsApp</a>
       </div>
     </div>
 
@@ -662,11 +701,11 @@
   <div id="confirmModal" class="modal-backdrop hidden">
     <div class="modal-card">
       <span class="modal-icon">📩</span>
-      <h3 id="modalTitle">¡Pago reportado!</h3>
+      <h3 id="modalTitle">¡Pago y registro completados!</h3>
       <div class="modal-invite-box" id="modalInviteText">
         ✅ <strong>A tu correo fue enviada la invitación a Canva</strong>, revisa tu correo y acepta unirte a Canva.
       </div>
-      <p class="modal-sub">Ahora toca el botón verde para enviarnos tu número de referencia por WhatsApp y activar tu cuenta.</p>
+      <p class="modal-sub">Ahora toca el botón verde para enviarnos tu comprobante y referencia por WhatsApp y activar tu cuenta.</p>
       <a href="#" target="_blank" class="btn btn-whatsapp" id="modalBtnWA" onclick="cerrarModalConfirmacion()">
         💬 Entendido, abrir WhatsApp
       </a>
@@ -687,9 +726,9 @@
       correoPagos: 'alexander1x33@gmail.com'
     };
 
-    var STORAGE_KEY = 'canva_reg_bloqueo_v1';
-    var SESSION_KEY = 'canva_reg_sesion_v1';
-    var COOLDOWN_KEY = 'canva_reg_cooldown_v1';
+    var STORAGE_KEY = 'canva_reg_bloqueo_v2';
+    var SESSION_KEY = 'canva_reg_sesion_v2';
+    var COOLDOWN_KEY = 'canva_reg_cooldown_v2';
     var HORAS_BLOQUEO = 24;
     var MINUTOS_SESION = 20;
     var MINUTOS_COOLDOWN = 60;
@@ -707,6 +746,7 @@
 
     var tasaBCV = 0;
     var planActual = { plan: '1 mes', dias: 30, usd: 1 };
+    var pagoConfirmado = { bloqueado: false, tipo: '', ref: '' };
     var datosCliente = { nombre: '', whatsapp: '', correo: '' };
     var yaGuardado = false;
     var intervaloSesion = null;
@@ -716,31 +756,34 @@
 
     var REF_UI = {
       pm: {
+        card: 'cardPagoMovil',
         box: 'refBoxPM',
         input: 'refPM',
         msg: 'refMsgPM',
-        btn: 'waPagoMovil',
-        banner: 'inviteBannerPM',
+        btn: 'btnLockPM',
         soloNumeros: true,
-        textoActivo: '💬 Confirmar pago y abrir WhatsApp'
+        nombreMetodo: 'Pago Móvil',
+        textoActivo: '✅ Confirmar referencia y llenar mis datos'
       },
       bin: {
+        card: 'cardBinance',
         box: 'refBoxBin',
         input: 'refBin',
         msg: 'refMsgBin',
-        btn: 'waBinance',
-        banner: 'inviteBannerBin',
+        btn: 'btnLockBin',
         soloNumeros: false,
-        textoActivo: '💬 Confirmar pago Binance y abrir WhatsApp'
+        nombreMetodo: 'Binance Pay',
+        textoActivo: '✅ Confirmar referencia y llenar mis datos'
       },
       pay: {
+        card: 'cardPaypal',
         box: 'refBoxPay',
         input: 'refPay',
         msg: 'refMsgPay',
-        btn: 'waPaypal',
-        banner: 'inviteBannerPay',
+        btn: 'btnLockPay',
         soloNumeros: false,
-        textoActivo: '💬 Confirmar pago PayPal y abrir WhatsApp'
+        nombreMetodo: 'PayPal',
+        textoActivo: '✅ Confirmar referencia y llenar mis datos'
       }
     };
 
@@ -769,6 +812,19 @@
       return num.replace('.', ',') + ' Bs';
     }
 
+    function cargarDatosPagoEnUI() {
+      document.getElementById('pmBanco').textContent = DATOS_PAGO.pmBancoTexto;
+      document.getElementById('pmCedula').textContent = DATOS_PAGO.pmCedulaTexto;
+      document.getElementById('pmTelefono').textContent = DATOS_PAGO.pmTelTexto;
+      document.getElementById('pmMonto').textContent = calcularBsTexto(planActual.usd);
+
+      document.getElementById('binCorreo').textContent = DATOS_PAGO.correoPagos;
+      document.getElementById('binanceMonto').textContent = '$' + planActual.usd + ' USDT';
+
+      document.getElementById('payCorreo').textContent = DATOS_PAGO.correoPagos;
+      document.getElementById('paypalMonto').textContent = '$' + planActual.usd + ' USD';
+    }
+
     function cargarTasaBCV() {
       fetch('https://ve.dolarapi.com/v1/dolares/oficial')
         .then(function(res) { return res.json(); })
@@ -788,30 +844,6 @@
         });
     }
 
-    function datosClienteCompletos() {
-      return Boolean(
-        yaGuardado &&
-        datosCliente &&
-        String(datosCliente.nombre || '').trim().length >= 2 &&
-        validarFormatoWhatsapp(datosCliente.whatsapp) &&
-        validarFormatoCorreo(datosCliente.correo)
-      );
-    }
-
-    function desbloquearDatosPago() {
-      if (!datosClienteCompletos()) return;
-      document.getElementById('pmBanco').textContent = DATOS_PAGO.pmBancoTexto;
-      document.getElementById('pmCedula').textContent = DATOS_PAGO.pmCedulaTexto;
-      document.getElementById('pmTelefono').textContent = DATOS_PAGO.pmTelTexto;
-      document.getElementById('pmMonto').textContent = calcularBsTexto(planActual.usd);
-
-      document.getElementById('binCorreo').textContent = DATOS_PAGO.correoPagos;
-      document.getElementById('binanceMonto').textContent = '$' + planActual.usd + ' USDT';
-
-      document.getElementById('payCorreo').textContent = DATOS_PAGO.correoPagos;
-      document.getElementById('paypalMonto').textContent = '$' + planActual.usd + ' USD';
-    }
-
     function actualizarResumen() {
       var hoy = new Date();
       var fin = new Date(hoy.getTime());
@@ -826,71 +858,40 @@
       document.getElementById('sumUsd').textContent = '$' + planActual.usd + ' USD';
       document.getElementById('sumBs').textContent = calcularBsTexto(planActual.usd);
 
-      if (datosClienteCompletos()) {
-        desbloquearDatosPago();
-        document.getElementById('savedText').textContent =
-          'Ya recibimos tu correo (' + datosCliente.correo + ') para tu plan de ' + planActual.plan + ' ($' + planActual.usd + ' / ' + calcularBsTexto(planActual.usd) + '). Elige tu método de pago:';
-        var msgFix = 'Hola, soy ' + datosCliente.nombre + '. Me equivoqué en un dato al registrarme (correo puesto: ' + datosCliente.correo + '). ¿Me ayudas a corregirlo?';
-        document.getElementById('waCorregir').href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgFix);
-      }
+      cargarDatosPagoEnUI();
     }
 
-    // ================= VALIDACIÓN OBLIGATORIA DE WHATSAPP Y CORREO =================
+    // ================= PASO 1: PLANES, MÉTODOS Y REFERENCIA =================
 
-    function validarFormatoWhatsapp(valor) {
-      var limpio = String(valor || '').trim();
-      if (!/^\+[1-9]\d{7,14}$/.test(limpio)) return false;
-
-      // En Venezuela (+58) nunca empieza por 0 después del +58 y tiene exactamente 10 dígitos locales
-      if (limpio.indexOf('+58') === 0) {
-        if (limpio.charAt(3) === '0') return false;
-        return /^\+58[1-9]\d{9}$/.test(limpio);
+    function seleccionarPlan(btn, plan, dias, usd) {
+      if (pagoConfirmado.bloqueado || yaGuardado) return;
+      var botones = document.querySelectorAll('.plan-btn');
+      for (var i = 0; i < botones.length; i++) {
+        botones[i].classList.remove('active');
       }
-      return true;
+      btn.classList.add('active');
+      planActual = { plan: plan, dias: dias, usd: usd };
+      actualizarResumen();
     }
 
-    function validarFormatoCorreo(valor) {
-      var limpio = String(valor || '').trim();
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(limpio);
+    function abrirMetodosPago() {
+      document.getElementById('btnVerMetodos').classList.add('hidden');
+      document.getElementById('methodsSection').classList.remove('hidden');
+      document.getElementById('methodsSection').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function validarWhatsappEnVivo() {
-      var input = document.getElementById('whatsapp');
-      var hint = document.getElementById('waHint');
-      var val = input.value.trim();
+    function mostrarMetodo(tipo) {
+      if (pagoConfirmado.bloqueado || yaGuardado) return;
+      cargarDatosPagoEnUI();
+      document.getElementById('cardPagoMovil').classList.add('hidden');
+      document.getElementById('cardBinance').classList.add('hidden');
+      document.getElementById('cardPaypal').classList.add('hidden');
 
-      if (!val) {
-        input.style.borderColor = 'var(--border)';
-        hint.style.color = '#94a3b8';
-        hint.innerHTML = 'Obligatorio: escribe el <strong>+</strong> y el código de tu país pegado, <strong>sin el 0</strong> en Venezuela (Ej: <strong>+584143115685</strong> o <strong>+58412...</strong>).';
-        return;
-      }
-
-      if (val.indexOf('+580') === 0) {
-        input.style.borderColor = 'var(--danger)';
-        hint.style.color = '#fca5a5';
-        hint.innerHTML = '❌ <strong>Quita el 0 después del +58.</strong> En Venezuela no lleva cero. Escríbelo así: <strong>+584143115685</strong> o <strong>+58412...</strong>';
-        return;
-      }
-
-      if (!validarFormatoWhatsapp(val)) {
-        input.style.borderColor = 'var(--danger)';
-        hint.style.color = '#fca5a5';
-        if (val.charAt(0) !== '+') {
-          hint.innerHTML = 'Falta el <strong>+</strong> y el código de país. No pongas 0414 ni 414 solo. Ejemplo: <strong>+584143115685</strong> (Venezuela) o <strong>+34612345678</strong> (fuera del país).';
-        } else if (val.indexOf('+58') === 0) {
-          hint.innerHTML = 'Número de Venezuela incompleto o inválido. Debe llevar <strong>+58</strong> y 10 dígitos sin el 0 (Ej: <strong>+584143115685</strong>).';
-        } else {
-          hint.innerHTML = 'Formato inválido. Escribe el <strong>+</strong> y todos los números pegados sin espacios ni guiones (Ej: <strong>+584143115685</strong>).';
-        }
-      } else {
-        input.style.borderColor = 'var(--success)';
-        hint.style.color = '#86efac';
-        hint.textContent = '✅ Número con código de país válido.';
-      }
+      var targetId = tipo === 'pagomovil' ? 'cardPagoMovil' : (tipo === 'binance' ? 'cardBinance' : 'cardPaypal');
+      var card = document.getElementById(targetId);
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth' });
     }
-
-    // ================= VALIDACIÓN DE REFERENCIA (6 ÚLTIMOS NÚMEROS DEL RECIBO) =================
 
     function validarCodigoReferencia(valor, soloNumeros) {
       var limpio = String(valor || '').trim().toUpperCase();
@@ -915,6 +916,7 @@
     }
 
     function validarReferenciaEnVivo(tipo) {
+      if (pagoConfirmado.bloqueado) return false;
       var ui = REF_UI[tipo];
       if (!ui) return false;
 
@@ -967,34 +969,15 @@
       boxEl.classList.remove('invalid');
       boxEl.classList.add('valid');
       msgEl.className = 'ref-msg ok';
-      msgEl.textContent = '✅ Recibo #' + check.ref + ' listo para confirmar.';
+      msgEl.textContent = '✅ Recibo #' + check.ref + ' válido. Toca el botón para continuar.';
       btnEl.classList.remove('btn-whatsapp-locked');
       btnEl.classList.add('btn-whatsapp');
       btnEl.textContent = ui.textoActivo;
       return true;
     }
 
-    function construirEnlaceWhatsAppConRef(tipo, ref) {
-      var montoBs = calcularBsTexto(planActual.usd);
-      var msg = '';
-
-      if (tipo === 'pm') {
-        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el Pago Móvil de ' + montoBs + ' ($' + planActual.usd + ' a tasa BCV) por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
-      } else if (tipo === 'bin') {
-        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por Binance de $' + planActual.usd + ' USDT al correo ' + DATOS_PAGO.correoPagos + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
-      } else {
-        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por PayPal de $' + planActual.usd + ' USD al correo ' + DATOS_PAGO.correoPagos + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
-      }
-
-      return 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msg);
-    }
-
-    function intentarConfirmarPago(tipo) {
-      if (!datosClienteCompletos()) {
-        mostrarError('Primero completa tu nombre, WhatsApp y correo obligatorio.');
-        return;
-      }
-
+    function confirmarReferencia(tipo) {
+      if (pagoConfirmado.bloqueado) return;
       var ui = REF_UI[tipo];
       if (!ui) return;
 
@@ -1012,13 +995,208 @@
         return;
       }
 
-      var enlaceWA = construirEnlaceWhatsAppConRef(tipo, check.ref);
+      pagoConfirmado = { bloqueado: true, tipo: tipo, ref: check.ref };
+      bloquearPasoPagoUI();
+      precalentarServidor(false);
 
-      var bannerEl = document.getElementById(ui.banner);
-      bannerEl.innerHTML = '✅ <strong>A tu correo (' + datosCliente.correo + ') fue enviada la invitación a Canva.</strong> Revisa tu correo (y carpeta de Spam) y acepta unirte a Canva.';
-      bannerEl.classList.remove('hidden');
+      var datosStep = document.getElementById('datosStepSection');
+      datosStep.classList.remove('hidden');
+      datosStep.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(function() {
+        document.getElementById('nombre').focus();
+      }, 350);
+    }
 
-      document.getElementById('modalTitle').textContent = '¡Pago reportado (Ref: #' + check.ref + ')!';
+    function bloquearPasoPagoUI() {
+      var botonesPlan = document.querySelectorAll('.plan-btn');
+      for (var i = 0; i < botonesPlan.length; i++) {
+        botonesPlan[i].classList.remove('active');
+        if (botonesPlan[i].getAttribute('data-plan') === planActual.plan) {
+          botonesPlan[i].classList.add('active');
+        }
+        botonesPlan[i].disabled = true;
+      }
+
+      document.getElementById('btnVerMetodos').classList.add('hidden');
+      document.getElementById('methodsSection').classList.add('hidden');
+      document.getElementById('cardPagoMovil').classList.add('hidden');
+      document.getElementById('cardBinance').classList.add('hidden');
+      document.getElementById('cardPaypal').classList.add('hidden');
+
+      var ui = REF_UI[pagoConfirmado.tipo];
+      var nombreMet = ui ? ui.nombreMetodo : 'Pago';
+      document.getElementById('refLockedPill').textContent = '🔒 ' + nombreMet + ' • Ref: #' + pagoConfirmado.ref;
+    }
+
+    // ================= PASO 2: VALIDACIÓN OBLIGATORIA DE DATOS =================
+
+    function validarFormatoWhatsapp(valor) {
+      var limpio = String(valor || '').trim();
+      if (!/^\+[1-9]\d{7,14}$/.test(limpio)) return false;
+      if (limpio.indexOf('+58') === 0) {
+        if (limpio.charAt(3) === '0') return false;
+        return /^\+58[1-9]\d{9}$/.test(limpio);
+      }
+      return true;
+    }
+
+    function validarFormatoCorreo(valor) {
+      var limpio = String(valor || '').trim();
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(limpio);
+    }
+
+    function validarWhatsappEnVivo() {
+      var input = document.getElementById('whatsapp');
+      var hint = document.getElementById('waHint');
+      var val = input.value.trim();
+
+      if (!val) {
+        input.style.borderColor = 'var(--border)';
+        hint.style.color = '#94a3b8';
+        hint.innerHTML = 'Obligatorio: escribe el <strong>+</strong> y el código de tu país pegado, <strong>sin el 0</strong> en Venezuela (Ej: <strong>+584143115685</strong> o <strong>+58412...</strong>).';
+        return;
+      }
+
+      if (val.indexOf('+580') === 0) {
+        input.style.borderColor = 'var(--danger)';
+        hint.style.color = '#fca5a5';
+        hint.innerHTML = '❌ <strong>Quita el 0 después del +58.</strong> En Venezuela no lleva cero. Escríbelo así: <strong>+584143115685</strong> o <strong>+58412...</strong>';
+        return;
+      }
+
+      if (!validarFormatoWhatsapp(val)) {
+        input.style.borderColor = 'var(--danger)';
+        hint.style.color = '#fca5a5';
+        if (val.charAt(0) !== '+') {
+          hint.innerHTML = 'Falta el <strong>+</strong> y el código de país. No pongas 0414 ni 414 solo. Ejemplo: <strong>+584143115685</strong> (Venezuela) o <strong>+34612345678</strong> (fuera del país).';
+        } else if (val.indexOf('+58') === 0) {
+          hint.innerHTML = 'Número de Venezuela incompleto o inválido. Debe llevar <strong>+58</strong> y 10 dígitos sin el 0 (Ej: <strong>+584143115685</strong>).';
+        } else {
+          hint.innerHTML = 'Formato inválido. Escribe el <strong>+</strong> y todos los números pegados sin espacios ni guiones (Ej: <strong>+584143115685</strong>).';
+        }
+      } else {
+        input.style.borderColor = 'var(--success)';
+        hint.style.color = '#86efac';
+        hint.textContent = '✅ Número con código de país válido.';
+      }
+    }
+
+    function validarDatosEnVivo() {
+      if (yaGuardado) return true;
+      var nombre = document.getElementById('nombre').value.trim();
+      var whatsapp = document.getElementById('whatsapp').value.trim();
+      var correo = document.getElementById('correo').value.trim();
+      var btn = document.getElementById('btnEnviarFinal');
+
+      var todoOk = nombre.length >= 2 && validarFormatoWhatsapp(whatsapp) && validarFormatoCorreo(correo);
+
+      if (todoOk) {
+        ocultarError();
+        btn.classList.remove('btn-whatsapp-locked');
+        btn.classList.add('btn-whatsapp');
+        btn.textContent = '💬 Enviar comprobante por WhatsApp';
+      } else {
+        btn.classList.remove('btn-whatsapp');
+        btn.classList.add('btn-whatsapp-locked');
+        btn.textContent = '🔒 Completa tu nombre, WhatsApp y correo';
+      }
+      return todoOk;
+    }
+
+    function construirEnlaceWhatsAppConRef(tipo, ref) {
+      var montoBs = calcularBsTexto(planActual.usd);
+      var msg = '';
+
+      if (tipo === 'pm') {
+        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el Pago Móvil de ' + montoBs + ' ($' + planActual.usd + ' a tasa BCV) por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
+      } else if (tipo === 'bin') {
+        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por Binance de $' + planActual.usd + ' USDT al correo ' + DATOS_PAGO.correoPagos + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
+      } else {
+        msg = 'Hola, soy ' + datosCliente.nombre + '. Ya realicé el pago por PayPal de $' + planActual.usd + ' USD al correo ' + DATOS_PAGO.correoPagos + ' por el plan Canva Pro (' + planActual.plan + '). Mi correo de Canva es: ' + datosCliente.correo + '. Ref: #' + ref;
+      }
+
+      return 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msg);
+    }
+
+    function finalizarRegistroYWhatsApp() {
+      if (!pagoConfirmado.bloqueado || !pagoConfirmado.ref) {
+        mostrarError('Primero debes realizar el pago y colocar los últimos 6 dígitos de tu referencia.');
+        return;
+      }
+
+      // Si ya se guardó antes, solo vuelve a abrir el modal de WhatsApp
+      if (yaGuardado) {
+        abrirModalWhatsApp();
+        return;
+      }
+
+      var nombre = document.getElementById('nombre').value.trim();
+      var whatsapp = document.getElementById('whatsapp').value.trim();
+      var correo = document.getElementById('correo').value.trim();
+
+      if (!nombre || nombre.length < 2) {
+        mostrarError('Por favor escribe tu nombre y apellido obligatorio.');
+        document.getElementById('nombre').focus();
+        return;
+      }
+
+      if (whatsapp.indexOf('+580') === 0) {
+        validarWhatsappEnVivo();
+        mostrarError('En Venezuela no pongas el 0 después del +58. Ejemplo correcto: +584143115685.');
+        document.getElementById('whatsapp').focus();
+        return;
+      }
+
+      if (!whatsapp || !validarFormatoWhatsapp(whatsapp)) {
+        validarWhatsappEnVivo();
+        mostrarError('WhatsApp obligatorio: escribe el + y el código de tu país todo pegado (Ej: +584143115685).');
+        document.getElementById('whatsapp').focus();
+        return;
+      }
+
+      if (!correo || !validarFormatoCorreo(correo)) {
+        mostrarError('Correo obligatorio: ingresa un correo electrónico válido para tu invitación de Canva.');
+        document.getElementById('correo').focus();
+        return;
+      }
+      ocultarError();
+
+      datosCliente = { nombre: nombre, whatsapp: whatsapp, correo: correo };
+      yaGuardado = true;
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          expira: Date.now() + (HORAS_BLOQUEO * 60 * 60 * 1000),
+          datosCliente: datosCliente,
+          planActual: planActual,
+          pagoConfirmado: pagoConfirmado
+        }));
+      } catch (e) {}
+
+      bloquearTodoFinalUI();
+
+      var payloadStr = JSON.stringify({
+        accion: 'guardar',
+        hoja: HOJA_ACTUAL,
+        esCliente: true,
+        datos: {
+          nombre: nombre,
+          whatsapp: whatsapp,
+          correo: correo,
+          plan: planActual.plan,
+          inicio: formatISO(new Date())
+        }
+      });
+
+      payloadPendienteBeacon = payloadStr;
+      enviarRegistroConReintento(payloadStr, 1);
+
+      abrirModalWhatsApp();
+    }
+
+    function abrirModalWhatsApp() {
+      var enlaceWA = construirEnlaceWhatsAppConRef(pagoConfirmado.tipo, pagoConfirmado.ref);
+      document.getElementById('modalTitle').textContent = '¡Registro y pago reportados (Ref: #' + pagoConfirmado.ref + ')!';
       document.getElementById('modalInviteText').innerHTML =
         '✅ <strong>A tu correo (' + datosCliente.correo + ') fue enviada la invitación a Canva</strong>, revisa tu correo (y carpeta de Spam) y acepta unirte a Canva.';
       document.getElementById('modalBtnWA').href = enlaceWA;
@@ -1029,18 +1207,34 @@
       document.getElementById('confirmModal').classList.add('hidden');
     }
 
-    // ================= PLANES, RELOJ Y GUARDADO =================
+    function bloquearTodoFinalUI() {
+      detenerRelojPorRegistro();
+      bloquearPasoPagoUI();
 
-    function seleccionarPlan(btn, plan, dias, usd) {
-      if (yaGuardado) return;
-      var botones = document.querySelectorAll('.plan-btn');
-      for (var i = 0; i < botones.length; i++) {
-        botones[i].classList.remove('active');
-      }
-      btn.classList.add('active');
-      planActual = { plan: plan, dias: dias, usd: usd };
-      actualizarResumen();
+      document.getElementById('datosStepSection').classList.remove('hidden');
+      document.getElementById('nombre').value = datosCliente.nombre;
+      document.getElementById('whatsapp').value = datosCliente.whatsapp;
+      document.getElementById('correo').value = datosCliente.correo;
+      document.getElementById('nombre').disabled = true;
+      document.getElementById('whatsapp').disabled = true;
+      document.getElementById('correo').disabled = true;
+
+      var btn = document.getElementById('btnEnviarFinal');
+      btn.classList.remove('btn-whatsapp-locked');
+      btn.classList.add('btn-whatsapp');
+      btn.textContent = '💬 Volver a abrir WhatsApp con comprobante';
+
+      var banner = document.getElementById('inviteBannerFinal');
+      banner.innerHTML = '✅ <strong>A tu correo (' + datosCliente.correo + ') fue enviada la invitación a Canva.</strong> Revisa tu correo (y carpeta de Spam) y acepta unirte a Canva.';
+      banner.classList.remove('hidden');
+
+      var msgFix = 'Hola, soy ' + datosCliente.nombre + '. Me equivoqué en un dato al registrarme (correo puesto: ' + datosCliente.correo + ', Ref: #' + pagoConfirmado.ref + '). ¿Me ayudas a corregirlo?';
+      var fixLink = document.getElementById('waCorregir');
+      fixLink.href = 'https://wa.me/' + TU_WHATSAPP + '?text=' + encodeURIComponent(msgFix);
+      fixLink.classList.remove('hidden');
     }
+
+    // ================= RELOJ, BLOQUEO PREVIO Y ENVÍO =================
 
     function detenerRelojPorRegistro() {
       if (intervaloSesion) {
@@ -1056,31 +1250,6 @@
       timerEl.classList.add('done');
     }
 
-    function bloquearFormularioUI() {
-      if (!datosClienteCompletos()) return;
-      detenerRelojPorRegistro();
-
-      document.getElementById('nombre').value = datosCliente.nombre;
-      document.getElementById('whatsapp').value = datosCliente.whatsapp;
-      document.getElementById('correo').value = datosCliente.correo;
-      document.getElementById('nombre').disabled = true;
-      document.getElementById('whatsapp').disabled = true;
-      document.getElementById('correo').disabled = true;
-
-      var botonesPlan = document.querySelectorAll('.plan-btn');
-      for (var i = 0; i < botonesPlan.length; i++) {
-        botonesPlan[i].classList.remove('active');
-        if (botonesPlan[i].getAttribute('data-plan') === planActual.plan) {
-          botonesPlan[i].classList.add('active');
-        }
-        botonesPlan[i].disabled = true;
-      }
-
-      document.getElementById('btnGuardar').classList.add('hidden');
-      document.getElementById('savedSection').classList.remove('hidden');
-      actualizarResumen();
-    }
-
     function verificarBloqueoPrevio() {
       try {
         var raw = localStorage.getItem(STORAGE_KEY);
@@ -1092,14 +1261,17 @@
           reg.expira &&
           ahora < reg.expira &&
           reg.datosCliente &&
+          reg.pagoConfirmado &&
+          reg.pagoConfirmado.ref &&
           String(reg.datosCliente.nombre || '').trim().length >= 2 &&
           validarFormatoWhatsapp(reg.datosCliente.whatsapp) &&
           validarFormatoCorreo(reg.datosCliente.correo)
         ) {
           datosCliente = reg.datosCliente;
           planActual = reg.planActual || planActual;
+          pagoConfirmado = reg.pagoConfirmado;
           yaGuardado = true;
-          bloquearFormularioUI();
+          bloquearTodoFinalUI();
         } else {
           localStorage.removeItem(STORAGE_KEY);
         }
@@ -1137,7 +1309,6 @@
 
     function iniciarControlTiempo() {
       if (yaGuardado) return;
-
       var ahora = Date.now();
 
       try {
@@ -1240,90 +1411,7 @@
       }
     });
 
-    function guardarDatosCliente() {
-      if (yaGuardado) return;
-
-      var nombre = document.getElementById('nombre').value.trim();
-      var whatsapp = document.getElementById('whatsapp').value.trim();
-      var correo = document.getElementById('correo').value.trim();
-
-      if (!nombre || nombre.length < 2) {
-        mostrarError('Por favor escribe tu nombre y apellido obligatorio.');
-        document.getElementById('nombre').focus();
-        return;
-      }
-
-      if (whatsapp.indexOf('+580') === 0) {
-        validarWhatsappEnVivo();
-        mostrarError('En Venezuela no pongas el 0 después del +58. Ejemplo correcto: +584143115685.');
-        document.getElementById('whatsapp').focus();
-        return;
-      }
-
-      if (!whatsapp || !validarFormatoWhatsapp(whatsapp)) {
-        validarWhatsappEnVivo();
-        mostrarError('WhatsApp obligatorio: escribe el + y el código de tu país todo pegado (Ej: +584143115685).');
-        document.getElementById('whatsapp').focus();
-        return;
-      }
-
-      if (!correo || !validarFormatoCorreo(correo)) {
-        mostrarError('Correo obligatorio: ingresa un correo electrónico válido para tu invitación de Canva.');
-        document.getElementById('correo').focus();
-        return;
-      }
-      ocultarError();
-
-      datosCliente = { nombre: nombre, whatsapp: whatsapp, correo: correo };
-      yaGuardado = true;
-
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          expira: Date.now() + (HORAS_BLOQUEO * 60 * 60 * 1000),
-          datosCliente: datosCliente,
-          planActual: planActual
-        }));
-      } catch (e) {}
-
-      bloquearFormularioUI();
-      document.getElementById('savedSection').scrollIntoView({ behavior: 'smooth' });
-
-      var payloadStr = JSON.stringify({
-        accion: 'guardar',
-        hoja: HOJA_ACTUAL,
-        esCliente: true,
-        datos: {
-          nombre: nombre,
-          whatsapp: whatsapp,
-          correo: correo,
-          plan: planActual.plan,
-          inicio: formatISO(new Date())
-        }
-      });
-
-      payloadPendienteBeacon = payloadStr;
-      enviarRegistroConReintento(payloadStr, 1);
-    }
-
-    function mostrarMetodo(tipo) {
-      if (!datosClienteCompletos()) {
-        mostrarError('Completa primero tu nombre, WhatsApp y correo para ver los datos de pago.');
-        return;
-      }
-
-      desbloquearDatosPago();
-      document.getElementById('cardPagoMovil').classList.add('hidden');
-      document.getElementById('cardBinance').classList.add('hidden');
-      document.getElementById('cardPaypal').classList.add('hidden');
-
-      var targetId = tipo === 'pagomovil' ? 'cardPagoMovil' : (tipo === 'binance' ? 'cardBinance' : 'cardPaypal');
-      var card = document.getElementById(targetId);
-      card.classList.remove('hidden');
-      card.scrollIntoView({ behavior: 'smooth' });
-    }
-
     function copiarCampoPago(clave, btn) {
-      if (!datosClienteCompletos()) return;
       var valor = DATOS_PAGO[clave] || '';
       if (valor) copiarTexto(valor, btn);
     }
@@ -1346,18 +1434,15 @@
     }
 
     function copiarMontoBs(btn) {
-      if (!datosClienteCompletos()) return;
       var val = calcularBsNumero(planActual.usd) || 'Consultar';
       copiarTexto(val, btn);
     }
 
     function copiarMontoUsd(btn) {
-      if (!datosClienteCompletos()) return;
       copiarTexto(String(planActual.usd), btn);
     }
 
     function copiarTodoPM(btn) {
-      if (!datosClienteCompletos()) return;
       var texto = 'Pago Móvil\nBanco: ' + DATOS_PAGO.pmBancoTexto + '\nCédula: ' + DATOS_PAGO.pmCedulaRaw + '\nTeléfono: ' + DATOS_PAGO.pmTelRaw + '\nMonto: ' + calcularBsTexto(planActual.usd);
       copiarTexto(texto, btn);
     }
